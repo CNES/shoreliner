@@ -52,11 +52,6 @@ if inputs['Vegetation']:
 
 if not('RGB' in os.listdir()) and inputs['RGB']:
     os.mkdir('RGB')
-# polygon=pickle.load(open(r'C:\Users\Marca\Desktop\THESE\Shoreliner\data_in\poly_gray.pkl','rb'))
-# polygon=[[[[-75.81,36.06],
-#             [-75.81,36.15],
-#             [-75.69,36.15],
-#             [-75.69,36.06]]]]
 
 global polygon_geom
 polygon_geom=ee.Geometry.Polygon(polygon)
