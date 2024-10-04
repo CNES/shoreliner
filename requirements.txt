@@ -1,0 +1,7 @@
+earthengine-api
+scikit-image
+pandas
+shapely
+shutup
+stats
+astropy

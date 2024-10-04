@@ -1,0 +1,9 @@
+virtualenv --system-site-package GEE
+source GEE/bin/activate
+pip install --no-cache-dir pygdal==1.11.4.3  
+pip install --no-cache-dir earthengine-api 
+pip install --no-cache-dir ipykernel 
+python -m ipykernel  install --user --name GEE
+
+
+

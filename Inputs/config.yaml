@@ -1,0 +1,88 @@
+---
+
+##### PROJECT NAME AND LOCATION
+# project
+EE_ID :  strange-bird-356322
+Project : testLS2
+
+#transects path (transects in EPSG:4326)
+PathTransect : valid_TrucVert.p
+
+###transects creation
+CreateTransects : True
+#Coordonates of N points to define the ROI
+ROI_array : [[-1.95,43.45],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#[[-2,43.5],[-2,43.25],[-1.5,43.25],[-1.5,43.5]]
+#Transect length in km
+Length_transect : 1
+#Approximate inter-transects distance in km
+Inter_transect : 0.1
+#Path to source wl shapefile
+Shapefile_path : /DataShorelines/gshhg_shp/GSHHS_shp/h/GSHHS_h_L1.shp
+#transects path (transects in EPSG:4326)
+NewPathTransect : transects_projectname.p
+
+##### USER-DEFINED INPUTS
+# Features to detect
+Waterline : True
+SandBar : False
+Vegetation : False
+
+# Download also RGB images (for qualitative validation)
+RGB : False
+
+# Download WL.shp and TR.shp to see it on QGIS
+WLshp : False
+TRshp : True
+
+#ROIs
+SizeROI : 0.04   #approximate ROIs size (in degrees 1° ~ 100km)
+SaveShpROI : True
+
+# starting and ending dates (YYYY/MM/DD)
+Dates:
+    - 1984/01/01
+    - 2023/12/31
+
+# satellite missions wanted
+Missions:
+    - L5
+    - L7
+    - L8
+    - L9
+    - S2
+
+
+#Clouds
+MaxCloudCover : 20
+CloudMasks : False
+
+# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
+WaterlineIndex: SCoWI
+
+# SANDBAR INDEX band combination used : SBI
+SandBarIndex : SBI
+
+# VEGETATION INDEX band combination used : NDVI
+VegetationIndex : NDVI
+
+
+
+##### METHODOLOGY
+# preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
+Preprocessing:
+    - Bicubic
+
+# contouring method used : OtsuMS, CannyFilter
+Contouring : RefOtsuMS
+
+# outlier correction : IQR, modes (or None)
+IQR : True
+
+# post processing
+DeltaTimeSituSat : 45 #En nb de jours
+
+TideCorrection : True
+
+MSLOffset : 0 #If dealing with in-situ data, Offset between the datum used for the beach elevation profiles and MSL
+
+
