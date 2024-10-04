@@ -2,14 +2,14 @@
 
 ##### PROJECT NAME AND LOCATION
 # project
-EE_ID :  strange-bird-356322
-Project : testLS2
+EE_ID : idGEEproject
+Project : nameShorelineProject
 
 #transects path (transects in EPSG:4326)
-PathTransect : valid_TrucVert.p
+PathTransect : valid_TorreyPines.p
 
 ###transects creation
-CreateTransects : True
+CreateTransects : False
 #Coordonates of N points to define the ROI
 ROI_array : [[-1.95,43.45],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#[[-2,43.5],[-2,43.25],[-1.5,43.25],[-1.5,43.5]]
 #Transect length in km
