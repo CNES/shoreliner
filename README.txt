@@ -12,7 +12,7 @@ Projects : contains all your current or past waterline extraction projects, with
 
 PREWORK : 
 1 - Create a conda environment with basic packages : "conda create -n shoreliner spyder numpy scipy pandas matplotlib sympy cython" (shoreliner is a proposed name for the env, feel free to change it)
-  OR follow instructions setupGEEonTREX.txt to use it on the CNES-HPC
+  OR follow instructions envGEEonTREX.txt to use it on the CNES-HPC
 2 - Activate the environment (eg, conda activate shoreliner)
 3 - Download all the packages using first "pip install gdal" then "pip install -r PATH/requirements.txt"
 4 - After the account has been validated, you would need to authenticate using the command "earthengine authenticate"
