@@ -10,7 +10,7 @@ Projects : contains all your current or past waterline extraction projects, with
 ### You need a certified Google Earth Engine account to use this tool. Check on https://earthengine.google.com/ to create an account, and for details.
 ### Create a Google Earth Engine Project (required) : https://console.cloud.google.com/projectcreate
 
-PREWORK : 
+PREWORK (follow instructions setupGEEonTREX.txt to use it on TREX): 
 1 - Create a conda environment with basic packages : "conda create -n shoreliner spyder numpy scipy pandas matplotlib sympy cython" (shoreliner is a proposed name for the env, feel free to change it)
 2 - Activate the environment (eg, conda activate shoreliner)
 3 - Download all the packages using first "pip install gdal" then "pip install -r PATH/requirements.txt"
