@@ -2,7 +2,6 @@ import os
 import pickle
 import shutil
 #
-import osgeo
 from shapely.geometry import Polygon
 import geopandas as gpd
 import yaml
