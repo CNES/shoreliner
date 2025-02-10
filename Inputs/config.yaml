@@ -2,16 +2,17 @@
 
 ##### PROJECT NAME AND LOCATION
 # project
-EE_ID : idGEEproject
-Project : nameShorelineProject
+EE_ID :  strange-bird-356322
+Project : DublinBay
+NatureROI : Polygon
 
 #transects path (transects in EPSG:4326)
 PathTransect : valid_TorreyPines.p
 
 ###transects creation
 CreateTransects : False
-#Coordonates of N points to define the ROI
-ROI_array : [[-1.95,43.45],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#[[-2,43.5],[-2,43.25],[-1.5,43.25],[-1.5,43.5]]
+#Coordonates of N>=4 points to define the ROI
+ROI_array : [[-6.10,53.39],[-6.18,53.39],[-6.18,53.34],[-6.10,53.34]]#[[-1.95,43.45],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#
 #Transect length in km
 Length_transect : 1
 #Approximate inter-transects distance in km
@@ -35,20 +36,16 @@ WLshp : False
 TRshp : True
 
 #ROIs
-SizeROI : 0.04   #approximate ROIs size (in degrees 1° ~ 100km)
+SizeROI : 0.08   #approximate ROIs size (in degrees 1° ~ 100km)
 SaveShpROI : True
 
 # starting and ending dates (YYYY/MM/DD)
 Dates:
-    - 1984/01/01
-    - 2023/12/31
+    - 2023/09/01
+    - 2023/09/30
 
 # satellite missions wanted
 Missions:
-    - L5
-    - L7
-    - L8
-    - L9
     - S2
 
 
