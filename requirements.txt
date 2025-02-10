@@ -5,3 +5,4 @@ shapely
 shutup
 stats
 astropy
+geopandas
