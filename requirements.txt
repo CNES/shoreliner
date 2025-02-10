@@ -6,3 +6,4 @@ shutup
 stats
 astropy
 geopandas
+pickle
