@@ -2,6 +2,7 @@ import os
 import pickle
 import shutil
 #
+import osgeo
 from shapely.geometry import Polygon
 import geopandas as gpd
 import yaml
@@ -10,12 +11,16 @@ import sys
 sys.path.insert(0, r".\Codes")
 from Codes.functions import Tools
 
-force=False
+force=True
 
 path_codes = './Codes'
+path_work = os.getcwd()
 path_inputs  = './Inputs'
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join(path_inputs,file_inputs),'rb'),Loader = SafeLoader)
+
+if not 'Projects' in os.listdir():
+	os.mkdir('Projects')
 
 path_project = os.path.join('./Projects',inputs['Project'])
 
@@ -34,13 +39,19 @@ shutil.copy(os.path.join(path_codes,'template_postprocess.py'),os.path.join(path
 shutil.copy('job_check.py',os.path.join(path_project,'job_check.py'))
 shutil.copy('job_post.slurm',os.path.join(path_project,'job_post.slurm'))
 
-if inputs['CreateTransects']:
-    Tools.createTransects(inputs,os.getcwd())
-    transects = pickle.load(open(os.path.join('./DataExample',inputs['NewPathTransect']),'rb'))
-else:
-    transects = pickle.load(open(os.path.join('./DataExample',inputs['PathTransect']),'rb'))
+if inputs['NatureROI']=='Transects':
+    if inputs['CreateTransects']:
+        Tools.createTransects(inputs,os.getcwd())
+        transects = pickle.load(open(os.path.join('./DataExample',inputs['NewPathTransect']),'rb'))
+    else:
+        transects = pickle.load(open(os.path.join('./DataExample',inputs['PathTransect']),'rb'))
+    
+    ROIs,TRs = Tools.polyFromTransects(transects,d_ref = inputs['SizeROI'])
 
-ROIs,TRs = Tools.polyFromTransects(transects,d_ref = inputs['SizeROI'])
+elif inputs['NatureROI']=='Polygon':
+    ROIs = [[inputs['ROI_array']]]
+    TRs=[[0]]
+    transects=TRs
 
 if inputs['SaveShpROI']:
     polygons = [Polygon(coords[0]) for coords in ROIs]
