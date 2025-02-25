@@ -20,9 +20,6 @@ waterline = []
 lags = {'S2':5,'L5':15,'L7':7.5,'L8':7.5,'L9':7.5}
 #%%Process
 transects = pickle.load(open('transects.p','rb'))
-
-if inputs['TRshp']:
-    Tools.transectToSHPfile(transects, os.getcwd(), crs=3857)
     
 lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0,0]
 latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0,1]
@@ -30,6 +27,9 @@ epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
 
 for i in transects:
   transects[i]['transect_proj'] = Tools.convert_epsg(transects[i]['transect'][:,::-1],4326,epsg_target)[:,:2]
+
+if inputs['TRshp']:
+    Tools.transectToSHPfile(transects, os.getcwd(), crs=3857)
 
 OTSU=[]
 sat = []
