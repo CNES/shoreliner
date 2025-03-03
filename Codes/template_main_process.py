@@ -34,7 +34,7 @@ for i in transects:
   transects[i]['transect_proj'] = Tools.convert_epsg(transects[i]['transect'][:,::-1],4326,int(epsg_target))[:][:2]
 
 if inputs['TRshp']:
-    Tools.transectToSHPfile(transects, os.getcwd(), crs=3857)
+    Tools.transectToSHPfile(transects, os.getcwd(), crs=int(epsg_target))
 
 OTSU=[]
 sat = []
@@ -84,7 +84,7 @@ for i in list_img:
                 wl_tmp[:,1] -= lags[i[16:18]]
             
             if inputs['WLshp']:
-                Tools.waterlineToSHPfile(wl_tmp, tag_idx, i, os.getcwd(), crs=3857)
+                Tools.waterlineToSHPfile(wl_tmp, tag_idx, i, os.getcwd(), crs=int(epsg_target))
 
             waterline.append(wl_tmp)
             OTSU.append(t_otsu)
