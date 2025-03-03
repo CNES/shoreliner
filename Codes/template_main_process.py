@@ -21,12 +21,17 @@ lags = {'S2':5,'L5':15,'L7':7.5,'L8':7.5,'L9':7.5}
 #%%Process
 transects = pickle.load(open('transects.p','rb'))
     
-lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0,0]
-latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0,1]
+lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][0]
+latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
 epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
 
 for i in transects:
-  transects[i]['transect_proj'] = Tools.convert_epsg(transects[i]['transect'][:,::-1],4326,epsg_target)[:,:2]
+    tmp1 = [transects[i]['transect'][0][0],transects[i]['transect'][0][1]]
+    tmp2 = [transects[i]['transect'][1][0],transects[i]['transect'][1][1]]
+    transects[i]['transect'] = np.array([tmp1,tmp2])
+
+for i in transects:
+  transects[i]['transect_proj'] = Tools.convert_epsg(transects[i]['transect'][:,::-1],4326,int(epsg_target))[:][:2]
 
 if inputs['TRshp']:
     Tools.transectToSHPfile(transects, os.getcwd(), crs=3857)
@@ -97,6 +102,7 @@ for key in transects:
 transects = Tools.computeIntersection(waterline,transects,sat,inputs)
 
 for i in transects:
-    transects[i][tag_idx]['raw'] = Tools.removeNaN(transects[i][tag_idx]['raw'],inputs,varname='SDW_'+inputs['WaterlineIndex'])
+    transects[i][tag_idx]['raw'] = Tools.removeNaN(transects[i][tag_idx]['raw'],varname='SDW_'+inputs['WaterlineIndex'])
 
 pickle.dump(transects,open('transects.p','wb'))
+
