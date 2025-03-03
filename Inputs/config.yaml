@@ -4,10 +4,10 @@
 # project
 EE_ID :  strange-bird-356322
 Project : DublinBay
-NatureROI : Polygon
+NatureROI : Transects
 
 #transects path (transects in EPSG:4326)
-PathTransect : valid_TorreyPines.p
+PathTransect : transects_Dublin.p
 
 ###transects creation
 CreateTransects : False
