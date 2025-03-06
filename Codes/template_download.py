@@ -39,7 +39,6 @@ filepath = './'
 polygon=pickle.load(open('poly.json','rb'))
 transects=pickle.load(open('transects.p','rb'))
 
-GEE.folderCreation(inputs)
 
 if inputs['Waterline']:
     wl_f = GEE.index_f(inputs['WaterlineIndex'])
@@ -52,6 +51,8 @@ if inputs['Vegetation']:
 
 if not('RGB' in os.listdir()) and inputs['RGB']:
     os.mkdir('RGB')
+
+GEE.folderCreation(inputs)
 
 global polygon_geom
 polygon_geom=ee.Geometry.Polygon(polygon)
@@ -173,10 +174,6 @@ if inputs['RGB']:
     rgb_list=rgb_data.toList(sizeDataset)
     filepath_rgb = os.path.join(os.getcwd(),'RGB')
 length=sizeDataset.getInfo()
-
-
-
-
 
 
 
