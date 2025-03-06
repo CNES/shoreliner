@@ -12,6 +12,7 @@ from functions import Tools
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('../',file_inputs),'rb'),Loader = SafeLoader)
 tag_idx = inputs['WaterlineIndex']
+seg_method = inputs['Contouring']
 
 path_index = os.path.join('./',tag_idx)
 ploting=False
@@ -26,8 +27,8 @@ latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
 epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
 
 for i in transects:
-    tmp1 = [transects[i]['transect'][0][0],transects[i]['transect'][0][1]]
-    tmp2 = [transects[i]['transect'][1][0],transects[i]['transect'][1][1]]
+    tmp1 = [transects[i]['transect'][:][0][0],transects[i]['transect'][0][1]]
+    tmp2 = [transects[i]['transect'][:][1][0],transects[i]['transect'][1][1]]
     transects[i]['transect'] = np.array([tmp1,tmp2])
 
 for i in transects:
@@ -77,14 +78,16 @@ for i in list_img:
               if not valid:
                 continue
             elif inputs['Contouring'] == 'OtsuMS' :
-              t_otsu = Tools.otsu(INDEX, tag_idx, ploting=plting)
+              t_otsu, valid = Tools.otsu(INDEX, tag_idx, ploting=plting)
+              if not valid:
+                continue
             wl_tmp, wl_noproj_tmp = Tools.getWaterline(INDEX,t_otsu,gt,transects,date,inputs,i=i)
             if lag_corr:
                 wl_tmp[:,0] += lags[i[16:18]]
                 wl_tmp[:,1] -= lags[i[16:18]]
             
             if inputs['WLshp']:
-                Tools.waterlineToSHPfile(wl_tmp, tag_idx, i, os.getcwd(), crs=int(epsg_target))
+                Tools.waterlineToSHPfile(wl_tmp, tag_idx, seg_method, i, os.getcwd(), crs=int(epsg_target))
 
             waterline.append(wl_tmp)
             OTSU.append(t_otsu)
