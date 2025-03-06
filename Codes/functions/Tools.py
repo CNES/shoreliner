@@ -227,7 +227,7 @@ def norm(band):
 
 
 def refinedOtsu(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
-    img_val = img[np.logical_not(np.isnan(img))]
+    img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
     if not checkHisto(img_val):
         return np.nan,np.nan,False
     
@@ -338,7 +338,9 @@ def refinedOtsu(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
 
 
 def otsu(img,tag_idx,ax=[],val=256,ploting=False):
-    img_val = img[np.logical_not(np.isinf(img))]
+    img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
+    if not checkHisto(img_val):
+        return np.nan,False
     hist=np.histogram(img_val,val,density=True)
     pdf=runmedian(hist[0],5)
     bins=hist[1]
@@ -356,7 +358,7 @@ def otsu(img,tag_idx,ax=[],val=256,ploting=False):
         ax.set_xlabel('Index Value')
         ax.set_ylabel('Frequency')
         ax.set_ylim([0,maxy])
-    return t_otsu
+    return t_otsu, True
 
 
 def checkHisto(X,ploting=False,val=5):
@@ -857,15 +859,18 @@ def transectToSHPfile(transects, current_path, crs=3857):
     gdftr = gpd.GeoDataFrame(geometry=trsc_lines,crs=crs)
     gdftr.to_file(os.path.join(current_path,'TRSC.shp'))
 
-def waterlineToSHPfile(wl_tmp, tag_idx, image_name, current_path, crs=3857):
+def waterlineToSHPfile(wl_tmp, tag_idx, seg_method, image_name, current_path, crs=3857):
     """
     Create a .shp file of the waterline to visualize it on QGIS
     """
     if not('WL_'+tag_idx in os.listdir(current_path)):
         os.mkdir('WL_'+tag_idx)
+    if not(seg_method in os.listdir(os.path.join(current_path, 'WL_'+tag_idx))):
+        os.mkdir(os.path.join(current_path,'WL_'+tag_idx,seg_method))
+    save_path = os.path.join(current_path,'WL_'+tag_idx,seg_method)
     points = [Point(p) for p in wl_tmp]
     gdf = gpd.GeoDataFrame(geometry=points,crs=crs)
-    gdf.to_file(os.path.join(os.path.join(current_path,'WL_'+tag_idx),image_name[:-4]+'_WL.shp'))
+    gdf.to_file(os.path.join(save_path,image_name[:-4]+'_'+seg_method+'_WL.shp'))
 
 
 #%% POST PROCESS

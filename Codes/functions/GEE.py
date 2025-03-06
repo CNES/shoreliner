@@ -7,16 +7,16 @@ from osgeo import gdal
 global inputs
 #%% General
 
-def index_f2(name):
-    if name == 'SCoWI':
-        return([SCoWIL5,SCoWIL7,SCoWIL8,SCoWIL9,SCoWIS2])
-    elif name == 'MNDWI':
+# def index_f2(name):
+#     if name == 'SCoWI':
+#         return([SCoWIL5,SCoWIL7,SCoWIL8,SCoWIL9,SCoWIS2])
+#     elif name == 'MNDWI':
 
-        return([MNDWIL5,MNDWIL7,MNDWIL8,MNDWIL9,MNDWIS2])
-    elif name == 'NDVI':
-        return([NDVIL5,NDVIL7,NDVIL8,NDVIL9,NDVIS2])
-    else:
-        return('Error')
+#         return([MNDWIL5,MNDWIL7,MNDWIL8,MNDWIL9,MNDWIS2])
+#     elif name == 'NDVI':
+#         return([NDVIL5,NDVIL7,NDVIL8,NDVIL9,NDVIS2])
+#     else:
+#         return('Error')
 
 def index_f(name):
     if name == 'SCoWI':
@@ -27,8 +27,12 @@ def index_f(name):
         return(NDWI)
     elif name == 'AWEIsh':
         return(AWEIsh)
+    elif name == 'AWEIns':
+        return(AWEIns)
+    elif name == 'NDVI':
+        return(NDVI)
     else:
-        return('Error')
+        raise('Error : Unknown index. Index  known by default : SCoWI, MNDWI, NDWI, NDVI, AWEIns and AWEIsh')
 
 def resampleL5S2(satlist,inputs):
     process = inputs['Preprocessing']
@@ -202,6 +206,7 @@ def NDVI(image):
     return image.expression('(NIR-RED)/(NIR+GREEN)',#
     {
       'RED': image.select('red'),
+      'GREEN': image.select('green'),
       'NIR': image.select('nir')
     }).rename('NDVI').copyProperties(image,['date','satellite'])
 
@@ -231,6 +236,15 @@ def AWEIsh(image):
       'SWIR1': image.select('swir1'),
       'SWIR2': image.select('swir2')
     }).rename('AWEIsh').copyProperties(image,['date','satellite'])
+
+def AWEIns(image):
+    return image.expression('(4 * GREEN - 4 * SWIR1 - 0.25 * NIR - 2.75 * SWIR2)',#
+    {
+      'GREEN': image.select('green'),
+      'NIR': image.select('nir'),
+      'SWIR1': image.select('swir1'),
+      'SWIR2': image.select('swir2')
+    }).rename('AWEIns').copyProperties(image,['date','satellite'])
 
 
 def RGB(image):
