@@ -63,6 +63,27 @@ def preprocess(satlist,inputs):
         satlist = satlist.map(pansharpening)
     return satlist
 
+def dates(dates):
+    start = dates[0]
+    end = dates[1]
+    eeStart = ee.Date.fromYMD(int(start[:4]),int(start[5:7]),int(start[8:10]))
+    eeEnd = ee.Date.fromYMD(int(end[:4]),int(end[5:7]),int(end[8:10]))
+    return eeStart,eeEnd
+
+def satMissions(missions):
+    S2,L9,L8,L7,L5 = False,False,False,False,False
+    if 'S2' in missions:
+        S2=True
+    if 'L9' in missions:
+        L9=True
+    if 'L8' in missions:
+        L8=True
+    if 'L7' in missions:
+        L7=True
+    if 'L5' in missions:
+        L5=True
+    return S2,L9,L8,L7,L5
+
 #%% Preprocess
 def bicubicResampleAll(image):
     return image.resample('bicubic').reproject(
@@ -289,7 +310,7 @@ def folderCreation(inputs):
         except:
             pass
 
-def saveImage(imggee, i, filepath, index, poly):
+def saveImage(imggee, i, length, filepath, index, poly):
     
     img = imggee.getInfo()
     name=img['properties']['date'][:8]+'T'+img['properties']['date'][8:]+'_'+img['properties']['satellite']
@@ -297,7 +318,7 @@ def saveImage(imggee, i, filepath, index, poly):
     cond1=not(True in [name in j for j in os.listdir(filepath)])
     if (cond1):
     
-        print('Downloading...')
+        print('Downloading... ('+str(i+1)+'/'+str(length)+')')
         url = ee.data.makeDownloadUrl(ee.data.getDownloadId({
             'image': imggee,
             'bands': index,
