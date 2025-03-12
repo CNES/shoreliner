@@ -2,9 +2,13 @@
 
 ##### PROJECT NAME AND LOCATION
 # project
-EE_ID :  strange-bird-356322
-Project : DublinBay
+EE_ID :  YOURPROJECT
+roject : DublinBay
 NatureROI : Transects
+
+
+# HPC or local use (fill with HPC is using shoreliner on CNES HPC, local otherwise)
+typeUse : local
 
 #transects path (transects in EPSG:4326)
 PathTransect : transects_Dublin.p
@@ -32,7 +36,7 @@ Vegetation : False
 RGB : False
 
 # Download WL.shp and TR.shp to see it on QGIS
-WLshp : False
+WLshp : True
 TRshp : True
 
 #ROIs
@@ -50,11 +54,11 @@ Missions:
 
 
 #Clouds
-MaxCloudCover : 20
+MaxCloudCover : 50
 CloudMasks : False
 
 # WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
-WaterlineIndex: SCoWI
+WaterlineIndex: MNDWI
 
 # SANDBAR INDEX band combination used : SBI
 SandBarIndex : SBI
@@ -69,17 +73,7 @@ VegetationIndex : NDVI
 Preprocessing:
     - Bicubic
 
-# contouring method used : OtsuMS, CannyFilter
-Contouring : RefOtsuMS
-
-# outlier correction : IQR, modes (or None)
-IQR : True
-
-# post processing
-DeltaTimeSituSat : 45 #En nb de jours
-
-TideCorrection : True
-
-MSLOffset : 0 #If dealing with in-situ data, Offset between the datum used for the beach elevation profiles and MSL
+# contouring method used : Otsu, RefOtsu, MSV, WP
+Contouring : WP
 
 
