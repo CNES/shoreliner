@@ -73,11 +73,19 @@ for i in list_img:
         rate = idx_nan/lflat
         if rate<0.5:
             gt = img.GetGeoTransform()
-            if inputs['Contouring'] == 'RefOtsuMS' :
-              t_otsuini,t_otsu,valid = Segmentation.refinedOtsu(INDEX, tag_idx, ploting=plting, id_image=i)
+            if inputs['Contouring'] == 'RefOtsu' :
+              t_otsuref,t_otsu,valid = Segmentation.refinedOtsu(INDEX, tag_idx, ploting=plting, id_image=i)
               if not valid:
                 continue
-            elif inputs['Contouring'] == 'OtsuMS' :
+            elif inputs['Contouring'] == 'WP' :
+              t_otsuref,t_otsu,valid = Segmentation.weightedPeaks(INDEX, tag_idx, ploting=plting)
+              if not valid:
+                continue
+            elif inputs['Contouring'] == 'MSV' :
+              t_otsuref,t_otsu,valid = Segmentation.MSV(INDEX, tag_idx, ploting=plting)
+              if not valid:
+                continue
+            elif inputs['Contouring'] == 'Otsu' :
               t_otsu, valid = Segmentation.otsu(INDEX, tag_idx, ploting=plting)
               if not valid:
                 continue
@@ -108,3 +116,4 @@ for i in transects:
     transects[i][tag_idx]['raw'] = Tools.removeNaN(transects[i][tag_idx]['raw'],varname='SDW_'+inputs['WaterlineIndex'])
 
 pickle.dump(transects,open('transects.p','wb'))
+
