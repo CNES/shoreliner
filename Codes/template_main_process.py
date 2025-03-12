@@ -7,7 +7,7 @@ from yaml.loader import SafeLoader
 import datetime
 import sys
 sys.path.insert(0, r"../../../Codes")
-from functions import Tools
+from functions import Tools,Segmentation,toSHP
 
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('../',file_inputs),'rb'),Loader = SafeLoader)
@@ -35,7 +35,7 @@ for i in transects:
   transects[i]['transect_proj'] = Tools.convert_epsg(transects[i]['transect'][:,::-1],4326,int(epsg_target))[:][:2]
 
 if inputs['TRshp']:
-    Tools.transectToSHPfile(transects, os.getcwd(), crs=int(epsg_target))
+    toSHP.transectToSHPfile(transects, os.getcwd(), crs=int(epsg_target))
 
 OTSU=[]
 sat = []
@@ -74,20 +74,20 @@ for i in list_img:
         if rate<0.5:
             gt = img.GetGeoTransform()
             if inputs['Contouring'] == 'RefOtsuMS' :
-              t_otsuini,t_otsu,valid = Tools.refinedOtsu(INDEX, tag_idx, ploting=plting, id_image=i)
+              t_otsuini,t_otsu,valid = Segmentation.refinedOtsu(INDEX, tag_idx, ploting=plting, id_image=i)
               if not valid:
                 continue
             elif inputs['Contouring'] == 'OtsuMS' :
-              t_otsu, valid = Tools.otsu(INDEX, tag_idx, ploting=plting)
+              t_otsu, valid = Segmentation.otsu(INDEX, tag_idx, ploting=plting)
               if not valid:
                 continue
-            wl_tmp, wl_noproj_tmp = Tools.getWaterline(INDEX,t_otsu,gt,transects,date,inputs,i=i)
+            wl_tmp, wl_noproj_tmp = Segmentation.getWaterline(INDEX,t_otsu,gt,transects,date,inputs,i=i)
             if lag_corr:
                 wl_tmp[:,0] += lags[i[16:18]]
                 wl_tmp[:,1] -= lags[i[16:18]]
             
             if inputs['WLshp']:
-                Tools.waterlineToSHPfile(wl_tmp, tag_idx, seg_method, i, os.getcwd(), crs=int(epsg_target))
+                toSHP.waterlineToSHPfile(wl_tmp, tag_idx, seg_method, i, os.getcwd(), crs=int(epsg_target))
 
             waterline.append(wl_tmp)
             OTSU.append(t_otsu)
@@ -102,10 +102,9 @@ for key in transects:
     transects[key][tag_idx]['raw']['sat_missions'] = np.array(sat)
     transects[key][tag_idx]['raw']['index_threshold'] = np.array(OTSU)
 
-transects = Tools.computeIntersection(waterline,transects,sat,inputs)
+transects = Segmentation.computeIntersection(waterline,transects,sat,inputs)
 
 for i in transects:
     transects[i][tag_idx]['raw'] = Tools.removeNaN(transects[i][tag_idx]['raw'],varname='SDW_'+inputs['WaterlineIndex'])
 
 pickle.dump(transects,open('transects.p','wb'))
-

@@ -16,7 +16,7 @@ import sys
 sys.path.insert(0, r"../../../Codes/functions")
 import yaml
 from yaml.loader import SafeLoader
-import Tools, GEE
+import GEE
 
 
 global inputs
@@ -27,11 +27,11 @@ if not(inputs['Waterline'] or inputs['SandBar'] or inputs['Vegetataion']):
     sys.exit('No Feature to extract, please modify the config.yaml file')
 
 
-useS2,useL9,useL8,useL7,useL5=Tools.satMissions(inputs['Missions'])
+useS2,useL9,useL8,useL7,useL5=GEE.satMissions(inputs['Missions'])
 
 ee.Initialize(project=inputs['EE_ID'])
 
-start,end = Tools.dates(inputs['Dates'])
+start,end = GEE.dates(inputs['Dates'])
 
 
 
@@ -39,6 +39,7 @@ filepath = './'
 polygon=pickle.load(open('poly.json','rb'))
 transects=pickle.load(open('transects.p','rb'))
 
+GEE.folderCreation(inputs)
 
 if inputs['Waterline']:
     wl_f = GEE.index_f(inputs['WaterlineIndex'])
@@ -51,8 +52,6 @@ if inputs['Vegetation']:
 
 if not('RGB' in os.listdir()) and inputs['RGB']:
     os.mkdir('RGB')
-
-GEE.folderCreation(inputs)
 
 global polygon_geom
 polygon_geom=ee.Geometry.Polygon(polygon)
@@ -177,26 +176,30 @@ length=sizeDataset.getInfo()
 
 
 
+
+
+
+
 for i in range(length):
     
     if inputs['Waterline']:
         img = ee.Image(wl_list.get(i))
         try:
-            GEE.saveImage(img, i, filepath_wl, inputs['WaterlineIndex'], polygon_geom)
+            GEE.saveImage(img, i, length, filepath_wl, inputs['WaterlineIndex'], polygon_geom)
         except:
             continue
     
     if inputs['SandBar']:
         img = ee.Image(sb_list.get(i))
-        GEE.saveImage(img, i, filepath_sb, inputs['SandBarIndex'], polygon_geom)
+        GEE.saveImage(img, i, length, filepath_sb, inputs['SandBarIndex'], polygon_geom)
     
     if inputs['Vegetation']:
         img = ee.Image(vg_list.get(i))
-        GEE.saveImage(img, i, filepath_sb, inputs['VegetationIndex'], polygon_geom)
+        GEE.saveImage(img, i, length, filepath_sb, inputs['VegetationIndex'], polygon_geom)
         
     if inputs['RGB']:
         img = ee.Image(rgb_list.get(i))
-        GEE.saveImage(img, i, filepath_rgb, ['red','green','blue'], polygon_geom)
+        GEE.saveImage(img, i, length, filepath_rgb, ['red','green','blue'], polygon_geom)
         
 
         
