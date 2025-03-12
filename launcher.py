@@ -63,7 +63,6 @@ for i in ROIs:
     TR_out = dict()
     for j in TRs[c]:
         TR_out[j] = transects[j]
-#        TR_out[j]['transect_proj'] = Tools.convert_epsg(TR_out[j]['transect'][:,::-1],4326,3857)[:,:2]
     tmp = 'poly_'+str(c)
     path_tmp = os.path.join(path_project,tmp)
     if not(tmp in os.listdir(path_project)):
@@ -78,7 +77,8 @@ for i in ROIs:
     # job = open(os.path.join(path_tmp,"job.slurm"),"a")
     # job.writelines(L)
     # job.close()
-    os.chdir(path_tmp)
-    os.system('sbatch job.slurm')
-    os.chdir(path_work)
+    if inputs['typeUse']=='HPC':
+        os.chdir(path_tmp)
+        os.system('sbatch job.slurm')
+        os.chdir(path_work)
     c+=1
