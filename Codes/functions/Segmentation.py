@@ -278,7 +278,7 @@ def weightedPeaks(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
 def MSV(img,tag_idx,ax=[],val=256,ploting=False,valcheckHisto=5,val_iter=100):
     img_val = img.flatten()[np.logical_not(np.isnan(img.flatten()))]
     img_val = img_val[np.logical_not(np.isinf(img_val))]
-    if not checkHisto(img_val,valcheckHisto):
+    if not checkHisto(img_val,val=valcheckHisto):
         return np.nan, np.nan, False
     
     hist, bins = np.histogram(img_val,val,density=True)
