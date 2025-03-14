@@ -40,7 +40,7 @@ WLshp : True
 TRshp : True
 
 #ROIs
-SizeROI : 0.08   #approximate ROIs size (in degrees 1° ~ 100km)
+SizeROI : 0.04   #approximate ROIs size (in degrees 1° ~ 100km)
 SaveShpROI : True
 
 # starting and ending dates (YYYY/MM/DD)
@@ -55,18 +55,11 @@ Missions:
 
 #Clouds
 MaxCloudCover : 50
-CloudMasks : False
+PeakNoiseFilter : True
+PeakNoiseFilterRatio : 5
 
 # WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
-WaterlineIndex: MNDWI
-
-# SANDBAR INDEX band combination used : SBI
-SandBarIndex : SBI
-
-# VEGETATION INDEX band combination used : NDVI
-VegetationIndex : NDVI
-
-
+WaterlineIndex: SCoWI
 
 ##### METHODOLOGY
 # preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
@@ -74,6 +67,10 @@ Preprocessing:
     - Bicubic
 
 # contouring method used : Otsu, RefOtsu, MSV, WP
-Contouring : WP
+Contouring : RefOtsu
+
+# outlier correction : IQR
+Postprocessing :
+    - IQR
 
 
