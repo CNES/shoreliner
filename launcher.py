@@ -16,7 +16,7 @@ force=True
 path_codes = './Codes'
 path_work = os.getcwd()
 path_inputs  = './Inputs'
-file_inputs = 'config.yaml'
+file_inputs = 'template_config.yaml'
 inputs = yaml.load(open(os.path.join(path_inputs,file_inputs),'rb'),Loader = SafeLoader)
 
 if not 'Projects' in os.listdir():
@@ -34,7 +34,7 @@ except:
         print('The project : '+inputs['Project']+' already exists, if you wanna continue put force=True in this script.')
         raise
     
-shutil.copy(os.path.join(path_inputs,'config.yaml'),os.path.join(path_project,'config.yaml'))
+shutil.copy(os.path.join(path_inputs,'template_config.yaml'),os.path.join(path_project,'config.yaml'))
 shutil.copy(os.path.join(path_codes,'template_postprocess.py'),os.path.join(path_project,'postprocess.py'))
 shutil.copy('job_check.py',os.path.join(path_project,'job_check.py'))
 shutil.copy('job_post.slurm',os.path.join(path_project,'job_post.slurm'))
