@@ -456,7 +456,7 @@ def drawConceptualGraph(inputs,pathsave):
             y1 = 5+130*j
             x2 = 105+130*i
             y2 = 105+130*j
-            print([(x1,y1),(x2,y2)])
+            #print([(x1,y1),(x2,y2)])
             cv2.rectangle(img,(x1,y1),(x2,y2),(0,0,0),(1))
     cv2.arrowedLine(img,(105,55),(134,55),(0,0,0),(1))
     cv2.arrowedLine(img,(235,55),(264,55),(0,0,0),(1))
