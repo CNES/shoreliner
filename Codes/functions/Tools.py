@@ -11,6 +11,8 @@ from scipy import signal, integrate, interpolate
 import math
 import pickle
 import copy
+import cv2
+import matplotlib.pyplot as plt
 
 #%% transect construction
 
@@ -442,4 +444,92 @@ def integratePowerSpectrum(dates,Xall,freqMax):
         ci = [beach_slopes[np.argmin(E)],beach_slopes[np.argmin(E)]]
     
     return beach_slopes[np.argmin(E)], ci
+
+def drawConceptualGraph(inputs,pathsave):
+    
+    fig,ax = plt.subplots(figsize=(20,12))
+    img = np.zeros((250, 500, 3), dtype="uint8")
+    img[:] = (255,255,255)
+    for i in range(4):
+        for j in range(2):
+            x1 = 5+130*i
+            y1 = 5+130*j
+            x2 = 105+130*i
+            y2 = 105+130*j
+            print([(x1,y1),(x2,y2)])
+            cv2.rectangle(img,(x1,y1),(x2,y2),(0,0,0),(1))
+    cv2.arrowedLine(img,(105,55),(134,55),(0,0,0),(1))
+    cv2.arrowedLine(img,(235,55),(264,55),(0,0,0),(1))
+    cv2.arrowedLine(img,(365,55),(394,55),(0,0,0),(1))
+    cv2.arrowedLine(img,(445,105),(445,134),(0,0,0),(1))
+    cv2.arrowedLine(img,(135,185),(106,185),(0,0,0),(1))
+    cv2.arrowedLine(img,(265,185),(236,185),(0,0,0),(1))
+    cv2.arrowedLine(img,(395,185),(366,185),(0,0,0),(1))
+    plt.imshow(img)
+    plt.text(10,22,'STUDY CASE\nDEFINITION',fontsize=15,fontweight='bold')
+    plt.text(140,15,'IMAGE COLLECTION',fontsize=15,fontweight='bold')
+    plt.text(270,15,'PRE-PROCESSING',fontsize=15,fontweight='bold')
+    plt.text(400,15,'BAND COMBINATION',fontsize=15,fontweight='bold')
+    plt.text(400,145,'THRESHOLDING',fontsize=15,fontweight='bold')
+    plt.text(270,145,'CONTOURING',fontsize=15,fontweight='bold')
+    plt.text(140,152,'PROJECTION OVER\nTRANSECTS',fontsize=15,fontweight='bold')
+    plt.text(10,145,'POST-PROCESSING',fontsize=15,fontweight='bold')
+    
+    ##STUDY
+    
+    plt.text(10,45,'localisation : '+inputs['Project'],fontsize=12)
+    plt.text(10,60,'subROI size : '+str(inputs['SizeROI'])+'°',fontsize=12)
+    plt.text(10,75,'start : '+inputs['Dates'][0],fontsize=12)
+    plt.text(10,90,'subROI size : '+inputs['Dates'][1],fontsize=12)
+    
+    ##IMAGE COLLECTION
+    missions = ''
+    for i in inputs['Missions']:
+        missions += i+', '
+    missions = missions[:-2]
+    plt.text(140,45,'missions : '+missions,fontsize=12)
+    plt.text(140,60,'cloud filter : '+str(inputs['MaxCloudCover'])+'%',fontsize=12)
+    
+    ##PRE-PROCESSING
+    prepro = inputs['Preprocessing']
+    if 'Pansharpening' in prepro:
+        plt.text(270,45,'pansharpening : yes',fontsize=12)
+    else:
+        plt.text(270,45,'pansharpening : no',fontsize=12)
+    if 'Bicubic' in prepro:
+        plt.text(270,75,'resampling : bicubic\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=12)
+    elif 'Bilinear' in prepro :
+        plt.text(270,75,'resampling : bilinear\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=12)
+    
+    ##BAND COMBINATION
+    plt.text(400,45,'index : '+inputs['WaterlineIndex'],fontsize=12)
+    if inputs['PeakNoiseFilter']:
+        plt.text(400,60,'peak/noise filter : yes (ratio : '+str(inputs['PeakNoiseFilterRatio'])+')',fontsize=12)
+    else:
+        plt.text(400,60,'peak/noise filter : no',fontsize=12)
+    
+    ##THRESHOLDING
+    plt.text(400,175,'method : '+inputs['Contouring'],fontsize=12)
+    
+    ##CONTOURING
+    plt.text(270,175,'method : Marching Squares',fontsize=12)
+    ##POST-PROCESSING
+    postpro = inputs['Postprocessing']
+    if 'IQR' in postpro:
+        plt.text(10,175,'outlier removal : IQR',fontsize=12)
+    else:
+        plt.text(10,175,'outlier removal : no',fontsize=12)
+    # if 'Resampling' in postpro:
+    #     plt.text(10,190,'resampling : '+inputs['Postprocessing']['Resampling'],fontsize=12)
+    # else:
+    #     plt.text(10,190,'resampling : no',fontsize=12)
+    # if 'Interpolation' in postpro:
+    #     plt.text(10,205,'interpolation : '+inputs['Postprocessing']['Interpolation'],fontsize=12)
+    # else:
+    #     plt.text(10,205,'interpolation : no',fontsize=12)
+    
+    fig.patch.set_visible(False)
+    ax.axis('off')
+    
+    plt.savefig(os.path.join(pathsave,'SDWConceptualGraph.png'))
 
