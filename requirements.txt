@@ -6,4 +6,5 @@ shutup
 stats
 astropy
 geopandas
+opencv-python
 pickle
