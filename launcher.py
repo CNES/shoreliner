@@ -38,6 +38,7 @@ shutil.copy(os.path.join(path_inputs,'config.yaml'),os.path.join(path_project,'c
 shutil.copy(os.path.join(path_codes,'template_postprocess.py'),os.path.join(path_project,'postprocess.py'))
 shutil.copy('job_check.py',os.path.join(path_project,'job_check.py'))
 shutil.copy('job_post.slurm',os.path.join(path_project,'job_post.slurm'))
+Tools.drawConceptualGraph(inputs, path_project)
 
 if inputs['NatureROI']=='Transects':
     if inputs['CreateTransects']:
@@ -82,3 +83,4 @@ for i in ROIs:
         os.system('sbatch job.slurm')
         os.chdir(path_work)
     c+=1
+
