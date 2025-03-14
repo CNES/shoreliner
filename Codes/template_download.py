@@ -16,15 +16,16 @@ import sys
 sys.path.insert(0, r"../../../Codes/functions")
 import yaml
 from yaml.loader import SafeLoader
-import GEE
+import GEE, Tools
 
 
-global inputs
+global inputs,epsg_target
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('../',file_inputs),'rb'),Loader = SafeLoader)
 
 if not(inputs['Waterline'] or inputs['SandBar'] or inputs['Vegetataion']):
     sys.exit('No Feature to extract, please modify the config.yaml file')
+
 
 
 useS2,useL9,useL8,useL7,useL5=GEE.satMissions(inputs['Missions'])
@@ -38,6 +39,10 @@ start,end = GEE.dates(inputs['Dates'])
 filepath = './'
 polygon=pickle.load(open('poly.json','rb'))
 transects=pickle.load(open('transects.p','rb'))
+lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][0]
+latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
+epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
+
 
 GEE.folderCreation(inputs)
 
@@ -67,6 +72,17 @@ if inputs['RGB']:
     rgb_data=ee.ImageCollection([])
 
 
+def ensureProjLandsat(image):
+    return image.reproject(
+        **{
+      'crs':'EPSG:'+epsg_target,
+      'scale': 15}).copyProperties(image,['res','date','satellite'])
+
+def ensureProjS2(image):
+    return image.reproject(
+        **{
+      'crs':'EPSG:'+epsg_target,
+      'scale': 10}).copyProperties(image,['res','date','satellite'])
 #Image Collection generation and SCoWI computation 
 #%%S2 ini
 
@@ -77,13 +93,17 @@ if useS2:
     S2 = GEE.resampleL5S2(S2,inputs)
     
     if inputs['Waterline']:
-        wl_data=wl_data.merge(S2.map(wl_f))
+        wl_data=wl_data.merge(S2.map(wl_f).map(ensureProjS2))
     if inputs['SandBar']:
         sb_data=sb_data.merge(S2.map(sb_f))
     if inputs['Vegetation']:
         vg_data.merge(S2.map(vg_f))
     if inputs['RGB']:
-        rgb_data = rgb_data.merge(S2.map(GEE.RGB))
+        rgb_data = rgb_data.merge(S2.map(GEE.RGB).map(ensureProjS2))
+    
+    
+    
+    
 #%%L8 ini
 
 if useL8:
@@ -93,13 +113,13 @@ if useL8:
     L8 = GEE.resampleL7L8L9(L8, inputs)
 
     if inputs['Waterline']:
-        wl_data=wl_data.merge(L8.map(wl_f))
+        wl_data=wl_data.merge(L8.map(wl_f).map(ensureProjLandsat))
     if inputs['SandBar']:
         sb_data=sb_data.merge(L8.map(sb_f))
     if inputs['Vegetation']:
         vg_data.merge(L8.map(vg_f))
     if inputs['RGB']:
-        rgb_data = rgb_data.merge(L8.map(GEE.RGB))
+        rgb_data = rgb_data.merge(L8.map(GEE.RGB).map(ensureProjLandsat))
 #%%L5 ini
 
 if useL5:
@@ -110,13 +130,13 @@ if useL5:
     
     
     if inputs['Waterline']:
-        wl_data=wl_data.merge(L5.map(wl_f))
+        wl_data=wl_data.merge(L5.map(wl_f).map(ensureProjLandsat))
     if inputs['SandBar']:
         sb_data=sb_data.merge(L5.map(sb_f))
     if inputs['Vegetation']:
         vg_data.merge(L5.map(vg_f))
     if inputs['RGB']:
-        rgb_data = rgb_data.merge(L5.map(GEE.RGB))
+        rgb_data = rgb_data.merge(L5.map(GEE.RGB).map(ensureProjLandsat))
 #%%L7 ini
 
 if useL7:
@@ -126,13 +146,13 @@ if useL7:
     L7 = GEE.resampleL7L8L9(L7, inputs)
     
     if inputs['Waterline']:
-        wl_data=wl_data.merge(L7.map(wl_f))
+        wl_data=wl_data.merge(L7.map(wl_f).map(ensureProjLandsat))
     if inputs['SandBar']:
         sb_data=sb_data.merge(L7.map(sb_f))
     if inputs['Vegetation']:
         vg_data.merge(L7.map(vg_f))
     if inputs['RGB']:
-        rgb_data = rgb_data.merge(L7.map(GEE.RGB))
+        rgb_data = rgb_data.merge(L7.map(GEE.RGB).map(ensureProjLandsat))
 #%%L9 ini
 
 if useL9:
@@ -140,15 +160,15 @@ if useL9:
     L9 = L9.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt('CLOUD_COVER',inputs['MaxCloudCover']))
     L9 = L9.map(GEE.normalizeBandNamesL9)
     L9 = GEE.resampleL7L8L9(L9, inputs)
-  
+    
     if inputs['Waterline']:
-        wl_data=wl_data.merge(L9.map(wl_f))
+        wl_data=wl_data.merge(L9.map(wl_f).map(ensureProjLandsat))
     if inputs['SandBar']:
         sb_data=sb_data.merge(L9.map(sb_f))
     if inputs['Vegetation']:
         vg_data.merge(L9.map(vg_f))
     if inputs['RGB']:
-        rgb_data = rgb_data.merge(L9.map(GEE.RGB))
+        rgb_data = rgb_data.merge(L9.map(GEE.RGB).map(ensureProjLandsat))
 
 #%% IMAGE SAVING ON THE LOCAL COMPUTER/SERVER
 if inputs['Waterline']:
@@ -157,8 +177,11 @@ elif inputs['SandBar']:
     sizeDataset = sb_data.size()
 elif inputs['Vegetation']:
     sizeDataset = sb_data.size()
+    
 
 
+
+#wl_data = wl_data.map(ensureProj)
 
 if inputs['Waterline']:
     wl_list=wl_data.toList(sizeDataset)
@@ -176,14 +199,11 @@ length=sizeDataset.getInfo()
 
 
 
-
-
-
-
 for i in range(length):
     
     if inputs['Waterline']:
         img = ee.Image(wl_list.get(i))
+        
         try:
             GEE.saveImage(img, i, length, filepath_wl, inputs['WaterlineIndex'], polygon_geom)
         except:
@@ -200,6 +220,8 @@ for i in range(length):
     if inputs['RGB']:
         img = ee.Image(rgb_list.get(i))
         GEE.saveImage(img, i, length, filepath_rgb, ['red','green','blue'], polygon_geom)
+        
+
         
 
         
