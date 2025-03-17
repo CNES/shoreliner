@@ -147,10 +147,11 @@ def computeIntersection(shorelines, transects, sat_id, inputs):
         # transects[key][inputs['WaterlineIndex']]['raw']['SDW_'+inputs['WaterlineIndex']] = intersections[:,j]
     return transects
 
-def refinedOtsu(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
+def refinedOtsu(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if not checkHisto(img_val):
-        return np.nan,np.nan,False
+    if inputs['PeakNoiseFilter']:
+        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
+            return np.nan,np.nan,False
     
     hist, bins = np.histogram(img_val,val,density=True)
 
@@ -212,10 +213,11 @@ def refinedOtsu(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
 
 
 
-def otsu(img,tag_idx,ax=[],val=256,ploting=False):
+def otsu(img,tag_idx,inputs,ax=[],val=256,ploting=False):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if not checkHisto(img_val):
-        return np.nan,False
+    if inputs['PeakNoiseFilter']:
+        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
+            return np.nan,np.nan,False
     hist,bins=np.histogram(img_val,val,density=True)
     bins = np.array([bins[i]+(bins[i+1]-bins[i])/2 for i in range(len(bins)-1)])
     t_otsu=0
@@ -233,10 +235,11 @@ def otsu(img,tag_idx,ax=[],val=256,ploting=False):
         ax.set_ylim([0,maxy])
     return t_otsu, True
 
-def weightedPeaks(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
+def weightedPeaks(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if not checkHisto(img_val):
-        return np.nan,np.nan,False
+    if inputs['PeakNoiseFilter']:
+        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
+            return np.nan,np.nan,False
     
     hist, bins = np.histogram(img_val,val,density=True)
 
@@ -275,11 +278,12 @@ def weightedPeaks(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
         t_opti = maxl + 0.7*(maxr-maxl)
     return t_otsu, t_opti, True
 
-def MSV(img,tag_idx,ax=[],val=256,ploting=False,valcheckHisto=5,val_iter=100):
+def MSV(img,tag_idx,inputs,ax=[],val=256,ploting=False,valcheckHisto=5,val_iter=100):
     img_val = img.flatten()[np.logical_not(np.isnan(img.flatten()))]
     img_val = img_val[np.logical_not(np.isinf(img_val))]
-    if not checkHisto(img_val,val=valcheckHisto):
-        return np.nan, np.nan, False
+    if inputs['PeakNoiseFilter']:
+        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
+            return np.nan,np.nan,False
     
     hist, bins = np.histogram(img_val,val,density=True)
 
