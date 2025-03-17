@@ -74,19 +74,19 @@ for i in list_img:
         if rate<0.5:
             gt = img.GetGeoTransform()
             if inputs['Contouring'] == 'RefOtsu' :
-              t_otsuref,t_otsu,valid = Segmentation.refinedOtsu(INDEX, tag_idx, ploting=plting, id_image=i)
+              t_otsuref,t_otsu,valid = Segmentation.refinedOtsu(INDEX, tag_idx, inputs, ploting=plting, id_image=i)
               if not valid:
                 continue
             elif inputs['Contouring'] == 'WP' :
-              t_otsuref,t_otsu,valid = Segmentation.weightedPeaks(INDEX, tag_idx, ploting=plting)
+              t_otsuref,t_otsu,valid = Segmentation.weightedPeaks(INDEX, tag_idx, inputs, ploting=plting)
               if not valid:
                 continue
             elif inputs['Contouring'] == 'MSV' :
-              t_otsuref,t_otsu,valid = Segmentation.MSV(INDEX, tag_idx, ploting=plting)
+              t_otsuref,t_otsu,valid = Segmentation.MSV(INDEX, tag_idx, inputs, ploting=plting)
               if not valid:
                 continue
             elif inputs['Contouring'] == 'Otsu' :
-              t_otsu, valid = Segmentation.otsu(INDEX, tag_idx, ploting=plting)
+              t_otsu, valid = Segmentation.otsu(INDEX, tag_idx, inputs, ploting=plting)
               if not valid:
                 continue
             wl_tmp, wl_noproj_tmp = Segmentation.getWaterline(INDEX,t_otsu,gt,transects,date,inputs,i=i)
