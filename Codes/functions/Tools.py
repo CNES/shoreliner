@@ -480,7 +480,7 @@ def drawConceptualGraph(inputs,pathsave):
     plt.text(10,45,'localisation : '+inputs['Project'],fontsize=12)
     plt.text(10,60,'subROI size : '+str(inputs['SizeROI'])+'°',fontsize=12)
     plt.text(10,75,'start : '+inputs['Dates'][0],fontsize=12)
-    plt.text(10,90,'subROI size : '+inputs['Dates'][1],fontsize=12)
+    plt.text(10,90,'end : '+inputs['Dates'][1],fontsize=12)
     
     ##IMAGE COLLECTION
     missions = ''
