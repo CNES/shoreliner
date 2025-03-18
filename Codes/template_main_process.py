@@ -16,7 +16,7 @@ seg_method = inputs['Contouring']
 
 path_index = os.path.join('./',tag_idx)
 ploting=False
-lag_corr=True
+lag_corr=False
 waterline = []
 lags = {'S2':5,'L5':15,'L7':7.5,'L8':7.5,'L9':7.5}
 #%%Process
