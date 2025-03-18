@@ -58,7 +58,7 @@ MaxCloudCover : 50
 PeakNoiseFilter : True
 PeakNoiseFilterRatio : 5
 
-# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
+# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEIns, MNDWI, AWEIsh, etc...
 WaterlineIndex: SCoWI
 
 ##### METHODOLOGY
