@@ -5,7 +5,7 @@ Inputs : contains the config file, open and edit it whenever you want to extract
 
 Codes : contains scripts and functions to extract the waterline.
 
-Projects : contains all your current or past waterline extraction projects, with codes, config files and outputs (will be created the first time you run the laucnher).
+Projects : contains all your current or past waterline extraction projects, with copies of codes, config and outputs files (will be created the first time you run the laucnher).
 
 ### You need a certified Google Earth Engine account to use this tool. Check on https://earthengine.google.com/ to create an account, and for details.
 ### Create a Google Earth Engine Project (required) : https://console.cloud.google.com/projectcreate
