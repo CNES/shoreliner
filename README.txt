@@ -1,4 +1,4 @@
-Modular Tool for Waterline Extraction (Graffin M., Touzé T., Bergsma E.), co-developped by LEGOS and CNES Earth Observation labs.
+Modular Tool for Waterline Extraction (Graffin M., Touzé T., Bergsma E., Almar R.), co-developped by LEGOS and CNES Earth Observation labs.
 
 Inputs : contains the config file, open and edit it whenever you want to extract waterlines on a new site or using a new method.*
 ### launcher.py needs files in pickle format, with a specific format (see example) to launch.
