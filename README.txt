@@ -2,9 +2,9 @@ Modular Tool for Waterline Extraction (Graffin M., Touzé T., Bergsma E., Almar 
 
 REFERENCE : 
 Marcan Graffin, Thibault Touzé, Erwin Bergsma and Rafael Almar.
-"Towards a global assessment of sandy shorelines: Systematic extraction and validation of optical satellite-derived coastal indicators at various sites"
+"Towards a global assessment of sandy shorelines: Systematic extraction and validation of optical satellite-derived coastal indicators at various sites", Remote Sensing of Environment (2025)
 https://www.sciencedirect.com/science/article/pii/S0034425725004377?via%3Dihub
-
+)
 Inputs : contains the config file, open and edit it whenever you want to extract waterlines on a new site or using a new method.*
 ### launcher.py needs files in pickle format, with a specific format (see example) to launch.
 
@@ -32,6 +32,7 @@ WATERLINE EXTRACTION :
 ***IF YOU NEED TO GENERATE TRANSECTS ALONG A LARGE AREA, 
 YOU CAN DOWNLOAD THE GSHHG REFERENCE COASTLINE AT https://www.soest.hawaii.edu/pwessel/gshhg/,
 PLACE THE SHAPEFILES IN A SPECIFIC FOLDER AND ENTER THE CORRESPONDING PATH IN THE CONFIG FILE
+
 
 
 
