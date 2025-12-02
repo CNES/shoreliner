@@ -39,8 +39,12 @@ start,end = GEE.dates(inputs['Dates'])
 filepath = './'
 polygon=pickle.load(open('poly.json','rb'))
 transects=pickle.load(open('transects.p','rb'))
-lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][0]
-latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
+try:
+    lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][0]
+    latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
+except:
+    lonEPSG=(inputs['ROI_array'][0][0]+inputs['ROI_array'][2][0])//2
+    latEPSG=(inputs['ROI_array'][0][1]+inputs['ROI_array'][2][1])//2
 epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
 
 
@@ -89,6 +93,8 @@ def ensureProjS2(image):
 if useS2:
     S2 = ee.ImageCollection("COPERNICUS/S2_HARMONIZED")
     S2 = S2.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE",inputs['MaxCloudCover']))
+    if inputs['SpecSeasonalPeriod']:
+        S2 = S2.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     S2 = S2.map(GEE.normalizeBandNamesS2)
     S2 = GEE.resampleL5S2(S2,inputs)
     
@@ -109,6 +115,8 @@ if useS2:
 if useL8:
     L8 = ee.ImageCollection("LANDSAT/LC08/C02/T1_TOA")
     L8 = L8.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt('CLOUD_COVER',inputs['MaxCloudCover']))
+    if inputs['SpecSeasonalPeriod']:
+        L8 = L8.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     L8 = L8.map(GEE.normalizeBandNamesL8)
     L8 = GEE.resampleL7L8L9(L8, inputs)
 
@@ -125,6 +133,8 @@ if useL8:
 if useL5:
     L5 = ee.ImageCollection("LANDSAT/LT05/C02/T1_TOA")
     L5 = L5.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt('CLOUD_COVER',inputs['MaxCloudCover']))
+    if inputs['SpecSeasonalPeriod']:
+        L5 = L5.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     L5 = L5.map(GEE.normalizeBandNamesL5)
     L5 = GEE.resampleL5S2(L5,inputs)
     
@@ -142,6 +152,8 @@ if useL5:
 if useL7:
     L7 = ee.ImageCollection("LANDSAT/LE07/C02/T1_TOA")
     L7 = L7.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt('CLOUD_COVER',inputs['MaxCloudCover']))
+    if inputs['SpecSeasonalPeriod']:
+        L7 = L7.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     L7 = L7.map(GEE.normalizeBandNamesL7)
     L7 = GEE.resampleL7L8L9(L7, inputs)
     
@@ -158,6 +170,8 @@ if useL7:
 if useL9:
     L9 = ee.ImageCollection("LANDSAT/LC09/C02/T1_TOA")
     L9 = L9.filterDate(start,end).filter(ee.Filter.bounds(polygon_tmp)).filter(ee.Filter.lt('CLOUD_COVER',inputs['MaxCloudCover']))
+    if inputs['SpecSeasonalPeriod']:
+        L9 = L9.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     L9 = L9.map(GEE.normalizeBandNamesL9)
     L9 = GEE.resampleL7L8L9(L9, inputs)
     
@@ -225,3 +239,4 @@ for i in range(length):
         
 
         
+
