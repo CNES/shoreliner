@@ -1,6 +1,6 @@
 #---------------------------------------------------------------------------------------------
-#--------------- Index maps generation and extraction from GEE -------------------------------
-#--------------- Marcan Graffin (largely inspired by Kilian Vos' CoastSat tool) -------------
+#--------------- Index maps collection (from GEE) --------------------------------------------
+#--------------- Marcan Graffin (largely inspired by CoastSat) --------------
 #---------------------------------------------------------------------------------------------
 import ee
 import time
@@ -38,13 +38,9 @@ start,end = GEE.dates(inputs['Dates'])
 
 filepath = './'
 polygon=pickle.load(open('poly.json','rb'))
-transects=pickle.load(open('transects.p','rb'))
-try:
-    lonEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][0]
-    latEPSG = transects[list(transects.keys())[len(transects)//2]]['transect'][0][1]
-except:
-    lonEPSG=(inputs['ROI_array'][0][0]+inputs['ROI_array'][2][0])//2
-    latEPSG=(inputs['ROI_array'][0][1]+inputs['ROI_array'][2][1])//2
+
+lonEPSG=(polygon[0][0][0]+polygon[0][2][0])/2
+latEPSG=(polygon[0][0][1]+polygon[0][2][1])/2
 epsg_target = Tools.convert_wgs_to_utm(lonEPSG, latEPSG)
 
 
@@ -211,7 +207,9 @@ if inputs['RGB']:
     filepath_rgb = os.path.join(os.getcwd(),'RGB')
 length=sizeDataset.getInfo()
 
-
+#CREATE A .CSV FILE TO CHECK THE COLLECTION OF IMAGES
+records = Tools.generate_attributes(wl_data.getInfo()['features'])
+Tools.upsert_satellite_csv(records)
 
 for i in range(length):
     
@@ -234,9 +232,14 @@ for i in range(length):
     if inputs['RGB']:
         img = ee.Image(rgb_list.get(i))
         GEE.saveImage(img, i, length, filepath_rgb, ['red','green','blue'], polygon_geom)
-        
+
+#UPDATE THE .CSV FILE TO INFORM ON THE PROGRESS OF DOWNLOADED IMAGES
+records = Tools.generate_attributes(wl_data.getInfo()['features'])
+Tools.upsert_satellite_csv(records)
+
 
         
 
         
+
 
