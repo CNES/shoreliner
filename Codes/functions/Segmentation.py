@@ -43,7 +43,7 @@ def checkHisto(X,ploting=False,val=5):
         return False
 
 
-def getWaterline(img,threshold,georef,transects,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
+def getWaterline(img,threshold,georef,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
     contours=find_contours(img,threshold)
     
     contours_out = [] #non_projected contours
@@ -98,8 +98,10 @@ def computeIntersection(shorelines, transects, sat_id, inputs):
         along_dist = {'S2':5,'L5':15,'L7':15,'L8':15,'L9':15}
     # loop through shorelines and compute the median intersection    
     intersections = np.zeros((len(shorelines),len(transects)))
+    c=-1
     for i in range(len(shorelines)):
-        #print('shoreline n°'+str(i+1)+' over '+str(len(shorelines)))
+        c+=1
+        print(format(c/len(shorelines)*100,'1.2f')+'%')
         sl = shorelines[i]
         max_along = along_dist[sat_id[i]]
         for j,key in enumerate(list(transects.keys())): 
@@ -147,11 +149,10 @@ def computeIntersection(shorelines, transects, sat_id, inputs):
         # transects[key][inputs['WaterlineIndex']]['raw']['SDW_'+inputs['WaterlineIndex']] = intersections[:,j]
     return transects
 
-def refinedOtsu(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
+def refinedOtsu(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if inputs['PeakNoiseFilter']:
-        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
-            return np.nan,np.nan,False
+    if not checkHisto(img_val):
+        return np.nan,np.nan,False
     
     hist, bins = np.histogram(img_val,val,density=True)
 
@@ -213,11 +214,10 @@ def refinedOtsu(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
 
 
 
-def otsu(img,tag_idx,inputs,ax=[],val=256,ploting=False):
+def otsu(img,tag_idx,ax=[],val=256,ploting=False):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if inputs['PeakNoiseFilter']:
-        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
-            return np.nan,np.nan,False
+    if not checkHisto(img_val):
+        return np.nan,False
     hist,bins=np.histogram(img_val,val,density=True)
     bins = np.array([bins[i]+(bins[i+1]-bins[i])/2 for i in range(len(bins)-1)])
     t_otsu=0
@@ -235,11 +235,10 @@ def otsu(img,tag_idx,inputs,ax=[],val=256,ploting=False):
         ax.set_ylim([0,maxy])
     return t_otsu, True
 
-def weightedPeaks(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
+def weightedPeaks(img,tag_idx,ax=[],val=256,ploting=False,id_image=0):
     img_val = img[np.logical_not(np.logical_or(np.isnan(img),np.isinf(img)))]
-    if inputs['PeakNoiseFilter']:
-        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
-            return np.nan,np.nan,False
+    if not checkHisto(img_val):
+        return np.nan,np.nan,False
     
     hist, bins = np.histogram(img_val,val,density=True)
 
@@ -278,12 +277,11 @@ def weightedPeaks(img,tag_idx,inputs,ax=[],val=256,ploting=False,id_image=0):
         t_opti = maxl + 0.7*(maxr-maxl)
     return t_otsu, t_opti, True
 
-def MSV(img,tag_idx,inputs,ax=[],val=256,ploting=False,valcheckHisto=5,val_iter=100):
+def MSV(img,tag_idx,ax=[],val=256,ploting=False,valcheckHisto=5,val_iter=100):
     img_val = img.flatten()[np.logical_not(np.isnan(img.flatten()))]
     img_val = img_val[np.logical_not(np.isinf(img_val))]
-    if inputs['PeakNoiseFilter']:
-        if not checkHisto(img_val,val=inputs['PeakNoiseFilterRatio']):
-            return np.nan,np.nan,False
+    if not checkHisto(img_val,val=valcheckHisto):
+        return np.nan, np.nan, False
     
     hist, bins = np.histogram(img_val,val,density=True)
 

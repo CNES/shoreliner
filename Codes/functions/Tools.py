@@ -13,6 +13,9 @@ import pickle
 import copy
 import cv2
 import matplotlib.pyplot as plt
+from pyproj import Geod, Transformer
+
+import csv
 
 #%% transect construction
 
@@ -139,7 +142,7 @@ def convert_wgs_to_utm(lon, lat):
     return epsg_code
 
 
-def polyFromTransects(transect, d_ref = 0.05):
+def polyFromTransects(transect,metric = False, d_ref = 0.05):
     polygon=[]
     classi_transect=[[]]
     lon_transect=[[]]
@@ -189,8 +192,8 @@ def polyFromTransects(transect, d_ref = 0.05):
                [lon2,lat2],
                [lon2,lat1],
                [lon1,lat1]]]
-         if abs(lat1)<60 and abs(lat2)<60:
-             polygon.append(tmp)
+         #if abs(lat1)<60 and abs(lat2)<60:
+         polygon.append(tmp)
     return polygon, classi_transect
 
 
@@ -456,7 +459,7 @@ def drawConceptualGraph(inputs,pathsave):
             y1 = 5+130*j
             x2 = 105+130*i
             y2 = 105+130*j
-            #print([(x1,y1),(x2,y2)])
+            # print([(x1,y1),(x2,y2)])
             cv2.rectangle(img,(x1,y1),(x2,y2),(0,0,0),(1))
     cv2.arrowedLine(img,(105,55),(134,55),(0,0,0),(1))
     cv2.arrowedLine(img,(235,55),(264,55),(0,0,0),(1))
@@ -477,59 +480,141 @@ def drawConceptualGraph(inputs,pathsave):
     
     ##STUDY
     
-    plt.text(10,45,'location : '+inputs['Project'],fontsize=12)
-    plt.text(10,60,'subROI size : '+str(inputs['SizeROI'])+'°',fontsize=12)
-    plt.text(10,75,'start : '+inputs['Dates'][0],fontsize=12)
-    plt.text(10,90,'end : '+inputs['Dates'][1],fontsize=12)
+    plt.text(10,45,'localisation : '+inputs['Project'],fontsize=13)
+    plt.text(10,60,'subROI size : '+str(inputs['SizeROI'])+'°',fontsize=13)
+    plt.text(10,75,'start : '+inputs['Dates'][0],fontsize=13)
+    plt.text(10,90,'end : '+inputs['Dates'][1],fontsize=13)
     
     ##IMAGE COLLECTION
     missions = ''
     for i in inputs['Missions']:
         missions += i+', '
     missions = missions[:-2]
-    plt.text(140,45,'missions : '+missions,fontsize=12)
-    plt.text(140,60,'cloud filter : '+str(inputs['MaxCloudCover'])+'%',fontsize=12)
+    plt.text(140,45,'missions : '+missions,fontsize=13)
+    plt.text(140,60,'cloud filter : '+str(inputs['MaxCloudCover'])+'%',fontsize=13)
     
     ##PRE-PROCESSING
     prepro = inputs['Preprocessing']
     if 'Pansharpening' in prepro:
-        plt.text(270,45,'pansharpening : yes',fontsize=12)
+        plt.text(270,45,'pansharpening : yes',fontsize=13)
     else:
-        plt.text(270,45,'pansharpening : no',fontsize=12)
+        plt.text(270,45,'pansharpening : no',fontsize=13)
     if 'Bicubic' in prepro:
-        plt.text(270,75,'resampling : bicubic\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=12)
+        plt.text(270,75,'resampling : bicubic\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=13)
     elif 'Bilinear' in prepro :
-        plt.text(270,75,'resampling : bilinear\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=12)
+        plt.text(270,75,'resampling : bilinear\n(S2 : SWIR1, SWIR2 : 10m\nLandsat : all bands : 15 m)',fontsize=13)
     
     ##BAND COMBINATION
-    plt.text(400,45,'index : '+inputs['WaterlineIndex'],fontsize=12)
+    plt.text(400,45,'index : '+inputs['WaterlineIndex'],fontsize=13)
     if inputs['PeakNoiseFilter']:
-        plt.text(400,60,'peak/noise filter : yes (ratio : '+str(inputs['PeakNoiseFilterRatio'])+')',fontsize=12)
+        plt.text(400,60,'peak/noise filter : yes (ratio : '+str(inputs['PeakNoiseFilterRatio'])+')',fontsize=13)
     else:
-        plt.text(400,60,'peak/noise filter : no',fontsize=12)
+        plt.text(400,60,'peak/noise filter : no',fontsize=13)
     
     ##THRESHOLDING
-    plt.text(400,175,'method : '+inputs['Contouring'],fontsize=12)
+    method = inputs['Contouring']
+    if method == 'RefOtsu':
+        method='Local Minimum'
+    if method == 'WP':
+        method = 'Weighted Peaks'
+    if method == 'MSV':
+        method = 'Minimum Shoreline\nVariability'
+    plt.text(400,175,'method : '+method,fontsize=13)
     
     ##CONTOURING
-    plt.text(270,175,'method : Marching Squares',fontsize=12)
+    plt.text(270,175,'method : Marching Squares',fontsize=13)
     ##POST-PROCESSING
     postpro = inputs['Postprocessing']
     if 'IQR' in postpro:
-        plt.text(10,175,'outlier removal : IQR',fontsize=12)
+        plt.text(10,175,'outlier removal : IQR',fontsize=13)
     else:
-        plt.text(10,175,'outlier removal : no',fontsize=12)
+        plt.text(10,175,'outlier removal : no',fontsize=13)
+    if 'TideCorrection' in postpro:
+        plt.text(10,205,'tide correction : yes',fontsize=13)
+    else:
+        plt.text(10,205,'tide correction : no',fontsize=13)
     # if 'Resampling' in postpro:
-    #     plt.text(10,190,'resampling : '+inputs['Postprocessing']['Resampling'],fontsize=12)
+    #     plt.text(10,190,'resampling : '+inputs['Postprocessing']['Resampling'],fontsize=13)
     # else:
-    #     plt.text(10,190,'resampling : no',fontsize=12)
+    #     plt.text(10,190,'resampling : no',fontsize=13)
     # if 'Interpolation' in postpro:
-    #     plt.text(10,205,'interpolation : '+inputs['Postprocessing']['Interpolation'],fontsize=12)
+    #     plt.text(10,205,'interpolation : '+inputs['Postprocessing']['Interpolation'],fontsize=13)
     # else:
-    #     plt.text(10,205,'interpolation : no',fontsize=12)
+    #     plt.text(10,205,'interpolation : no',fontsize=13)
     
     fig.patch.set_visible(False)
     ax.axis('off')
     
     plt.savefig(os.path.join(pathsave,'SDWConceptualGraph.png'))
 
+def upsert_satellite_csv(records, csv_path='img_collections.csv',UNIQUE_KEY = 'id'):
+    """
+    records: list of dicts with new metadata
+    csv_path: path to CSV catalog
+    """
+
+    existing_rows = {}
+    existing_fields = set()
+
+    # 1. Load existing CSV if it exists
+    if os.path.exists(csv_path):
+        with open(csv_path, mode="r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            existing_fields = set(reader.fieldnames)
+
+            for row in reader:
+                existing_rows[row[UNIQUE_KEY]] = row
+
+    # 2. Collect fields from new records
+    new_fields = set()
+    for record in records:
+        new_fields.update(record.keys())
+
+    # 3. Union of all fields (stable order)
+    all_fields = list(existing_fields | new_fields)
+
+    # Ensure UNIQUE_KEY is first column
+    if UNIQUE_KEY in all_fields:
+        all_fields.remove(UNIQUE_KEY)
+    all_fields.insert(0, UNIQUE_KEY)
+
+    # 4. Update or insert records
+    for record in records:
+        key = record[UNIQUE_KEY]
+
+        if key in existing_rows:
+            existing_rows[key].update(record)
+        else:
+            existing_rows[key] = {k: record.get(k, "") for k in all_fields}
+
+    # 5. Normalize rows (fill missing fields)
+    normalized_rows = []
+    for row in existing_rows.values():
+        normalized_rows.append({k: row.get(k, "") for k in all_fields})
+
+    # 6. Write back CSV
+    with open(csv_path, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=all_fields)
+        writer.writeheader()
+        writer.writerows(normalized_rows)
+
+def generate_attributes(metadata):
+    
+    img_index_downloaded=0
+    out = []
+    
+    for i in range(len(metadata)):
+        tmp = metadata[i]
+        name = tmp['properties']['date'][:8]+'T'+tmp['properties']['date'][8:]+'_'+tmp['properties']['satellite']
+        
+        if name+'.tif' in os.listdir('./'+tmp['bands'][0]['id']):
+            img_index_downloaded=1
+            
+        tmp_out = {
+            'id':name,
+            'cloud_cover':tmp['properties']['cloud_cover'],
+            tmp['bands'][0]['id']:img_index_downloaded}
+        
+        out.append(tmp_out)
+        
+    return out
