@@ -1,4 +1,4 @@
-Modular Tool for Waterline Extraction (Graffin M., Touzé T., Bergsma E., Almar R.), co-developped by LEGOS and CNES Earth Observation labs.
+Modular Tool for Waterline Extraction, co-developped by LEGOS and CNES Earth Observation labs.
 Contact : marcan.graffin@ird.fr
 
 REFERENCE : 
@@ -34,6 +34,7 @@ WATERLINE EXTRACTION :
 ***IF YOU NEED TO GENERATE TRANSECTS ALONG A LARGE AREA, 
 YOU CAN DOWNLOAD THE GSHHG REFERENCE COASTLINE AT https://www.soest.hawaii.edu/pwessel/gshhg/,
 PLACE THE SHAPEFILES IN A SPECIFIC FOLDER AND ENTER THE CORRESPONDING PATH IN THE CONFIG FILE
+
 
 
 
