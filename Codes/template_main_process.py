@@ -45,6 +45,10 @@ if inputs['NatureROI']=='Transects':
     if inputs['TRshp']:
         toSHP.transectToSHPfile(transects, os.getcwd(), crs=int(epsg_target))
 
+elif inputs['CreateTransects']:
+    wl_composite, wl_noproj_composite = Segmentation.composite_image(inputs,epsg=epsg_target,len_min=1000)
+    transects = Tools.transectsFromComposite(wl_composite,epsg=epsg_target,hspace=inputs['TransectSpacing'])
+
 OTSU=[]
 sat = []
 dates = []
@@ -106,7 +110,7 @@ for i in list_img:
                 print('Noisy : failed the quality check')
                 count+=1
                 continue
-            wl_tmp, wl_noproj_tmp = Segmentation.getWaterline(INDEX,t_otsu,gt,date,inputs,i=i)
+            wl_tmp, wl_noproj_tmp = Segmentation.getWaterline(INDEX,t_otsu,gt,inputs,i=i)
             if lag_corr:
                 wl_tmp[:,0] += lags[i[16:18]]
                 wl_tmp[:,1] -= lags[i[16:18]]
@@ -132,7 +136,7 @@ if inputs['NatureROI']=='Transects':
     for i in transects:
         transects[i][tag_idx]['raw'] = Tools.removeNaN(transects[i][tag_idx]['raw'],varname='SDW_'+inputs['WaterlineIndex'])
     
-    pickle.dump(transects,open('transects.p','wb'))
+    pickle.dump(transects,open('transects_test.p','wb'))
 
 if inputs['WLshp']:
     
@@ -156,5 +160,8 @@ if inputs['WLshp']:
     )
     
     merged.to_file("Merged_WL_"+inputs['WaterlineIndex']+"_"+inputs['Contouring']+".shp")
+
+
+
 
 
