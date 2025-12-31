@@ -2,27 +2,28 @@
 
 ##### PROJECT NAME AND LOCATION
 # project
-EE_ID :  YOURPROJECT
-Project : DublinBay
-NatureROI : Transects
+EE_ID : strange-bird-356322
+Project : TUTO
+NatureROI : Transects #Transects or Polygon
 
 
 # HPC or local use (fill with HPC is using shoreliner on CNES HPC, local otherwise)
 typeUse : local
 
 #transects path (transects in EPSG:4326)
-PathTransect : transects_Dublin.p
+PathTransect : path/to/transects.p
 
 ###transects creation
 CreateTransects : False
+TransectSpacing : 100
 #Coordonates of N>=4 points to define the ROI
-ROI_array : [[-6.10,53.39],[-6.18,53.39],[-6.18,53.34],[-6.10,53.34]]#[[-1.95,43.45],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#
+ROI_array : [[-105.95,69.205],[-105.95,69.08],[-105.42,69.08],[-105.42,69.205]]#[[-1.95,21.08],[-1.95,43.25],[-1.7,43.25],[-1.7,43.45]]#
 #Transect length in km
 Length_transect : 1
 #Approximate inter-transects distance in km
 Inter_transect : 0.1
 #Path to source wl shapefile
-Shapefile_path : /DataShorelines/gshhg_shp/GSHHS_shp/h/GSHHS_h_L1.shp
+Shapefile_path : \DataExample\GSHHS_h_L1.shp
 #transects path (transects in EPSG:4326)
 NewPathTransect : transects_projectname.p
 
@@ -37,34 +38,42 @@ RGB : False
 
 # Download WL.shp and TR.shp to see it on QGIS
 WLshp : True
-TRshp : True
+TRshp : False
 
 #ROIs
-SizeROI : 0.04   #approximate ROIs size (in degrees 1° ~ 100km)
+SizeROI : 0.15   #approximate ROIs size (in degrees 1° ~ 100km)
 SaveShpROI : True
 
-# starting and ending dates (YYYY/MM/DD)
+# starting and ending dates (YYYY/MM/DD) with possible tuning for monitoring over a specific time period over the year
 Dates:
-    - 2023/09/01
-    - 2023/09/30
+    - 2025/06/17
+    - 2025/06/18
+
+SpecSeasonalPeriod : True
+
+SpecDates:
+    - 06
+    - 11
 
 # satellite missions wanted
 Missions:
     - S2
+    - L8
+    - L9
 
 
 #Clouds
-MaxCloudCover : 50
+MaxCloudCover : 75
 PeakNoiseFilter : True
-PeakNoiseFilterRatio : 5
+PeakNoiseFilterRatio : 12
 
-# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEIns, MNDWI, AWEIsh, etc...
-WaterlineIndex: SCoWI
+# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
+WaterlineIndex: NDWI
 
 ##### METHODOLOGY
 # preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
 Preprocessing:
-    - Bicubic
+    - Bilinear
 
 # contouring method used : Otsu, RefOtsu, MSV, WP
 Contouring : RefOtsu
@@ -72,5 +81,6 @@ Contouring : RefOtsu
 # outlier correction : IQR
 Postprocessing :
     - IQR
+
 
 
