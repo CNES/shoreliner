@@ -14,10 +14,12 @@ import copy
 import cv2
 import matplotlib.pyplot as plt
 from pyproj import Geod, Transformer
-
+from shapely.geometry import MultiLineString
 import csv
 
 #%% transect construction
+
+
 
 def createTransects(inputs,current_path):
     """
@@ -307,7 +309,42 @@ def Mode(TR,inputs,n=0.65,valid=True):
         newTR[i] = np.delete(newTR[i],idx_otsu)
     return(newTR)
 
+def transectsFromComposite(wl_composite,epsg,hspace,length=200):
+    """
+    points      : list of (x, y) tuples in local/projected CRS
+    spacing     : transect spacing (meters)
+    length      : total transect length (meters)
+    epsg_local  : EPSG code of input CRS (projected)
+    """
+    line = MultiLineString(wl_composite)
+    distances = np.arange(0, line.length, hspace)
+    result = {}
 
+    for i, d in enumerate(distances, start=1):
+        p = line.interpolate(d)
+        p2 = line.interpolate(min(d + 1, line.length))
+
+        dx, dy = p2.x - p.x, p2.y - p.y
+        norm = np.hypot(dx, dy)
+        ux, uy = -dy / norm, dx / norm  # perpendicular unit vector
+
+        half = length / 2
+        transect_proj = np.array([
+            [p.x - ux * half, p.y - uy * half],
+            [p.x + ux * half, p.y + uy * half]
+        ])
+
+        # GeoSeries for reprojection
+        #gs = gpd.GeoSeries([transect_proj], crs=f"EPSG:{epsg}")
+        #transect_wgs84 = gs.to_crs(epsg=4326).iloc[0]
+
+        name = f"TR_{i:02d}"
+        result[name] = {
+            "transect_proj": transect_proj,
+            #"transect": transect_wgs84
+        }
+
+    return result
 
 def IQR(TR, varname,val1 = 0.25, val2 = 0.75, ratio=1.5):
     

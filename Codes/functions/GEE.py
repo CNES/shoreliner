@@ -71,6 +71,10 @@ def dates(dates):
     eeEnd = ee.Date.fromYMD(int(end[:4]),int(end[5:7]),int(end[8:10]))
     return eeStart,eeEnd
 
+def add_simple_date(image):
+    date = ee.String(image.get('date')).slice(0, 8)
+    return image.set('simple_date', date)
+
 
 def satMissions(missions):
     S2,L9,L8,L7,L5 = False,False,False,False,False
@@ -319,7 +323,6 @@ def saveImage(imggee, i, length, filepath, index, poly):
     print(name)
     cond1=not(True in [name in j for j in os.listdir(filepath)])
     if (cond1):
-    
         print('Downloading... ('+str(i+1)+'/'+str(length)+')')
         url = ee.data.makeDownloadUrl(ee.data.getDownloadId({
             'image': imggee,
@@ -342,7 +345,6 @@ def saveImage(imggee, i, length, filepath, index, poly):
         # stack bands into single .tif
             outds = gdal.BuildVRT(os.path.join(filepath,'stacked'+str(i)+'.vrt'), fn_tifs, separate=True)
             outds = gdal.Translate(os.path.join(filepath,name+'.tif'), outds)
-        # delete single-band files
             for fn in fn_tifs: os.remove(fn)
         # delete .vrt file
             os.remove(os.path.join(filepath,'stacked'+str(i)+'.vrt'))
@@ -353,40 +355,40 @@ def saveImage(imggee, i, length, filepath, index, poly):
                 os.remove(os.path.join(filepath,'data.tif.aux'))
         except:
             pass
-    else:
-        name=name+'_1'
-        cond2 = not(True in [name in j for j in os.listdir(filepath)])
-        if (cond2):
-            print('Downloading... ('+str(i+1)+'/'+str(length)+')')
-            url = ee.data.makeDownloadUrl(ee.data.getDownloadId({
-                'image': imggee,
-                'bands': index,
-                'region': poly,
-                'name': name
-                }))
+    # else:
+    #     name=name+'_1'
+    #     cond2 = not(True in [name in j for j in os.listdir(filepath)])
+    #     if (cond2):
+    #         print('Downloading... ('+str(i+1)+'/'+str(length)+')')
+    #         url = ee.data.makeDownloadUrl(ee.data.getDownloadId({
+    #             'image': imggee,
+    #             'bands': index,
+    #             'region': poly,
+    #             'name': name
+    #             }))
         
-            try:
-                local_zip, headers = urlretrieve(url)
-                # move zipfile from temp folder to data folder
-                dest_file = os.path.join(filepath, 'imagezip')
-                shutil.move(local_zip,dest_file)
-                # unzip file
-                with zipfile.ZipFile(dest_file) as local_zipfile:
-                    for fn in local_zipfile.namelist():
-                        local_zipfile.extract(fn, filepath)
-                # filepath + filename to single bands
-                    fn_tifs = [os.path.join(filepath,_) for _ in local_zipfile.namelist()]
-            # stack bands into single .tif
-                outds = gdal.BuildVRT(os.path.join(filepath,'stacked'+str(i)+'.vrt'), fn_tifs, separate=True)
-                outds = gdal.Translate(os.path.join(filepath,name+'.tif'), outds)
-            # delete single-band files
-                for fn in fn_tifs: os.remove(fn)
-            # delete .vrt file
-                os.remove(os.path.join(filepath,'stacked'+str(i)+'.vrt'))
-            # delete zipfile
-                os.remove(dest_file)
-            # delete data.tif.aux (not sure why this is created)
-                if os.path.exists(os.path.join(filepath,'data.tif.aux')):
-                    os.remove(os.path.join(filepath,'data.tif.aux'))
-            except:
-                pass
+    #         try:
+    #             local_zip, headers = urlretrieve(url)
+    #             # move zipfile from temp folder to data folder
+    #             dest_file = os.path.join(filepath, 'imagezip')
+    #             shutil.move(local_zip,dest_file)
+    #             # unzip file
+    #             with zipfile.ZipFile(dest_file) as local_zipfile:
+    #                 for fn in local_zipfile.namelist():
+    #                     local_zipfile.extract(fn, filepath)
+    #             # filepath + filename to single bands
+    #                 fn_tifs = [os.path.join(filepath,_) for _ in local_zipfile.namelist()]
+    #         # stack bands into single .tif
+    #             outds = gdal.BuildVRT(os.path.join(filepath,'stacked'+str(i)+'.vrt'), fn_tifs, separate=True)
+    #             outds = gdal.Translate(os.path.join(filepath,name+'.tif'), outds)
+    #         # delete single-band files
+    #             for fn in fn_tifs: os.remove(fn)
+    #         # delete .vrt file
+    #             os.remove(os.path.join(filepath,'stacked'+str(i)+'.vrt'))
+    #         # delete zipfile
+    #             os.remove(dest_file)
+    #         # delete data.tif.aux (not sure why this is created)
+    #             if os.path.exists(os.path.join(filepath,'data.tif.aux')):
+    #                 os.remove(os.path.join(filepath,'data.tif.aux'))
+    #         except:
+    #             pass

@@ -5,8 +5,74 @@ from skimage.transform import AffineTransform
 from scipy.signal import find_peaks
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(0, r"../../../Codes")
+sys.path.insert(0, r"../../Codes")
 from functions import Tools
+import os
+from osgeo import gdal
+from shapely.geometry import MultiLineString, LineString
+import geopandas as gpd
+
+
+def composite_image(inputs,select_only=["S2"],epsg=3857,len_min=10):
+    coll_path = './'+inputs['WaterlineIndex']
+    coll = os.listdir(coll_path)
+    arrays=[]
+    
+    if not('composite' in os.listdir('./')):
+        os.mkdir('composite')
+    
+    c=-1
+    total_length = len(coll)
+    for img in coll:
+        c+=1
+        if c%10==0:
+            print(c/total_length*100)
+        if img[-4:]=='.tif' and any(i in img for i in select_only):
+            ds = gdal.Open(os.path.join(coll_path,img))
+            try:
+                band = ds.GetRasterBand(1)
+                tmp = band.ReadAsArray().astype(np.float32)
+                tmp/=np.nanstd(tmp)
+                arrays.append(tmp)
+            except:
+                continue
+    mean_array = np.nanmean(arrays, axis=0)
+    mean_array[mean_array == 0] = np.nan
+    
+    driver = gdal.GetDriverByName("GTiff")
+    out_ds = driver.Create(
+        os.path.join('composite',"mean_"+inputs['WaterlineIndex']+".tif"),
+        ds.RasterXSize,
+        ds.RasterYSize,
+        1,
+        gdal.GDT_Float32
+    )
+    
+    out_ds.SetGeoTransform(ds.GetGeoTransform())
+    out_ds.SetProjection(ds.GetProjection())
+    out_ds.GetRasterBand(1).WriteArray(mean_array)
+    out_ds.FlushCache()
+    
+    wl, wl_noproj = getWaterline(mean_array, 0, ds.GetGeoTransform(), 0, inputs,len_min=len_min,flatten=False)
+    return wl,wl_noproj
+    # waterline = MultiLineString([LineString(seg) for seg in wl])
+    
+    # gdf = gpd.GeoDataFrame(
+    #     geometry=[waterline],          # <-- MUST be a list
+    #     crs=f"EPSG:{epsg}"              # safer CRS definition
+    # )
+    
+    # out = os.path.join(
+    #     "./composite",
+    #     f"WLmean_{inputs['WaterlineIndex']}.shp"
+    # )
+    
+    # gdf.to_file(out, driver="ESRI Shapefile", index=False)
+    
+    
+    # return wl,wl_noproj
+            
+    
 
 def checkHisto(X,ploting=False,val=5):
     """
@@ -43,7 +109,7 @@ def checkHisto(X,ploting=False,val=5):
         return False
 
 
-def getWaterline(img,threshold,georef,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
+def getWaterline(img,threshold,georef,inputs,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False,len_min=10,flatten=True):
     contours=find_contours(img,threshold)
     
     contours_out = [] #non_projected contours
@@ -63,7 +129,7 @@ def getWaterline(img,threshold,georef,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0
         for l, arr in enumerate(contours):
             
             tmp = arr[:,[1,0]]
-            if len(tmp)>10:
+            if len(tmp)>len_min:
                 points_regular.append(tmp)
                 points_converted.append(tform(tmp))
 
@@ -74,18 +140,20 @@ def getWaterline(img,threshold,georef,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0
         coords = [(wl[k,0], wl[k,1]) for k in range(len(wl))]
         # line = geometry.LineString(coords) # shapely LineString structure
         dist = np.sqrt((coords[0][0]-coords[-1][0])**2+(coords[0][1]-coords[-1][1])**2)
-        if len(coords)>30 and dist!=0:
+        if len(coords)>len_min and dist!=0:
             contours_long.append(wl)
             
-    
-    x_points = np.array([])
-    y_points = np.array([])
-    for k in range(len(contours_long)):
-        x_points = np.append(x_points,contours_long[k][:,0])
-        y_points = np.append(y_points,contours_long[k][:,1])
-    shoreline = np.transpose(np.array([x_points,y_points]))
-    contours_out = np.array(contours_out)
-    return shoreline, contours_out
+    if flatten:
+        x_points = np.array([])
+        y_points = np.array([])
+        for k in range(len(contours_long)):
+            x_points = np.append(x_points,contours_long[k][:,0])
+            y_points = np.append(y_points,contours_long[k][:,1])
+        shoreline = np.transpose(np.array([x_points,y_points]))
+        contours_out = np.array(contours_out)
+        return shoreline, contours_out
+    else:
+        return contours_long, contours_out
 
 def computeIntersection(shorelines, transects, sat_id, inputs):
     """
