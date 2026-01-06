@@ -123,7 +123,7 @@ for i in list_img:
             dates.append(date)
             sat.append(i[16:18])
 
-if inputs['NatureROI']=='Transects':
+if inputs['NatureROI']=='Transects' or inputs['CreateTransects']:
     for key in transects:
         transects[key][tag_idx]=dict()
         transects[key][tag_idx]['raw']=dict()
@@ -160,8 +160,3 @@ if inputs['WLshp']:
     )
     
     merged.to_file("Merged_WL_"+inputs['WaterlineIndex']+"_"+inputs['Contouring']+".shp")
-
-
-
-
-

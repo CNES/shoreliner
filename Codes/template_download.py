@@ -3,15 +3,8 @@
 #--------------- Marcan Graffin (largely inspired by Kilian Vos' CoastSat tool) -------------
 #---------------------------------------------------------------------------------------------
 import ee
-import time
-from urllib.request import urlretrieve
 import os
-import shutil
-import zipfile
-from osgeo import gdal, osr
 import pickle
-import numpy as np
-from shapely import geometry
 import sys
 sys.path.insert(0, r"../../../Codes/functions")
 import yaml
@@ -89,6 +82,7 @@ def best_image_per_dateS2(img):
     return same_day.first()
 
 def best_image_per_dateL9(img):
+    pix_max = S2.aggregate_max('valid_pixels')
     date = img.get('simple_date')
     same_day = S2.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
     return same_day.first()
@@ -128,6 +122,8 @@ if useS2:
     if inputs['SpecSeasonalPeriod']:
         S2 = S2.filter(ee.Filter.calendarRange(inputs['SpecDates'][0],inputs['SpecDates'][1],'month'))
     S2 = S2.map(GEE.normalizeBandNamesS2).map(add_quality_score).map(GEE.add_simple_date)
+    if inputs['FilterNonFullImages']:
+        S2 = GEE.filterNonFullImages(S2,inputs)
     S2_distinct=S2.distinct(['simple_date'])
     S2 = ee.ImageCollection(S2_distinct.map(best_image_per_dateS2))
     S2 = GEE.resampleL5S2(S2,inputs)
@@ -284,7 +280,6 @@ for i in range(length):
 records = Tools.generate_attributes(wl_data.getInfo()['features'])
 Tools.upsert_satellite_csv(records)
         
-
         
 
 
