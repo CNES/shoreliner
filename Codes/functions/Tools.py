@@ -309,7 +309,7 @@ def Mode(TR,inputs,n=0.65,valid=True):
         newTR[i] = np.delete(newTR[i],idx_otsu)
     return(newTR)
 
-def transectsFromComposite(wl_composite,epsg,hspace,length=200):
+def transectsFromComposite(wl_composite,epsg,hspace,length=400):
     """
     points      : list of (x, y) tuples in local/projected CRS
     spacing     : transect spacing (meters)
@@ -319,6 +319,7 @@ def transectsFromComposite(wl_composite,epsg,hspace,length=200):
     line = MultiLineString(wl_composite)
     distances = np.arange(0, line.length, hspace)
     result = {}
+    transects = []
 
     for i, d in enumerate(distances, start=1):
         p = line.interpolate(d)
@@ -333,16 +334,30 @@ def transectsFromComposite(wl_composite,epsg,hspace,length=200):
             [p.x - ux * half, p.y - uy * half],
             [p.x + ux * half, p.y + uy * half]
         ])
-
+        transects.append(transect_proj)
         # GeoSeries for reprojection
         #gs = gpd.GeoSeries([transect_proj], crs=f"EPSG:{epsg}")
         #transect_wgs84 = gs.to_crs(epsg=4326).iloc[0]
 
         name = f"TR_{i:02d}"
         result[name] = {
-            "transect_proj": transect_proj,
+            "transect_proj": np.array(transect_proj),
             #"transect": transect_wgs84
         }
+    
+    gdf = gpd.GeoDataFrame(
+    geometry=[line],
+    crs=f"EPSG:{epsg}"
+    )
+    
+    gdf.to_file("./composite/WLmean.shp", index=False)
+    
+    gdf = gpd.GeoDataFrame(
+    geometry=[MultiLineString(transects[1:])],
+    crs=f"EPSG:{epsg}"
+    )
+    
+    gdf.to_file("./composite/transects.shp", index=False)
 
     return result
 

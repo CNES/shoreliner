@@ -75,6 +75,9 @@ def add_simple_date(image):
     date = ee.String(image.get('date')).slice(0, 8)
     return image.set('simple_date', date)
 
+def filterNonFullImages(coll,inputs):
+    pix_max = ee.Number(coll.aggregate_max('valid_pixels'))
+    return coll.filter(ee.Filter.gte('valid_pixels', pix_max.multiply(inputs['FillingThreshold'])))
 
 def satMissions(missions):
     S2,L9,L8,L7,L5 = False,False,False,False,False

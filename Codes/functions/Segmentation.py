@@ -52,8 +52,8 @@ def composite_image(inputs,select_only=["S2"],epsg=3857,len_min=10):
     out_ds.SetProjection(ds.GetProjection())
     out_ds.GetRasterBand(1).WriteArray(mean_array)
     out_ds.FlushCache()
-    
-    wl, wl_noproj = getWaterline(mean_array, 0, ds.GetGeoTransform(), 0, inputs,len_min=len_min,flatten=False)
+    threshold, valid = otsu(mean_array, inputs['WaterlineIndex'], ploting=False)
+    wl, wl_noproj = getWaterline(mean_array, threshold, ds.GetGeoTransform(), 0, inputs,len_min=len_min,flatten=False)
     return wl,wl_noproj
     # waterline = MultiLineString([LineString(seg) for seg in wl])
     
