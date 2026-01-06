@@ -3,8 +3,8 @@
 ##### PROJECT NAME AND LOCATION
 # project
 EE_ID : strange-bird-356322
-Project : TUTO
-NatureROI : Transects #Transects or Polygon
+Project : CambridgeBay
+NatureROI : Polygon #Transects or Polygon
 
 
 # HPC or local use (fill with HPC is using shoreliner on CNES HPC, local otherwise)
@@ -43,13 +43,15 @@ TRshp : False
 #ROIs
 SizeROI : 0.15   #approximate ROIs size (in degrees 1° ~ 100km)
 SaveShpROI : True
+FilterNonFullImages : True
+FillingThreshold : 0.5
 
 # starting and ending dates (YYYY/MM/DD) with possible tuning for monitoring over a specific time period over the year
 Dates:
-    - 2025/06/17
-    - 2025/06/18
+    - 2025/07/01
+    - 2025/08/31
 
-SpecSeasonalPeriod : True
+SpecSeasonalPeriod : False
 
 SpecDates:
     - 06
@@ -58,22 +60,20 @@ SpecDates:
 # satellite missions wanted
 Missions:
     - S2
-    - L8
-    - L9
 
 
 #Clouds
-MaxCloudCover : 75
+MaxCloudCover : 50
 PeakNoiseFilter : True
 PeakNoiseFilterRatio : 12
 
 # WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
-WaterlineIndex: NDWI
+WaterlineIndex: SCoWI
 
 ##### METHODOLOGY
 # preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
 Preprocessing:
-    - Bilinear
+    - Bicubic
 
 # contouring method used : Otsu, RefOtsu, MSV, WP
 Contouring : RefOtsu
@@ -81,6 +81,5 @@ Contouring : RefOtsu
 # outlier correction : IQR
 Postprocessing :
     - IQR
-
 
 
