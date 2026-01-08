@@ -82,19 +82,18 @@ def best_image_per_dateS2(img):
     return same_day.first()
 
 def best_image_per_dateL9(img):
-    pix_max = S2.aggregate_max('valid_pixels')
     date = img.get('simple_date')
-    same_day = S2.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
+    same_day = L9.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
     return same_day.first()
 
 def best_image_per_dateL8(img):
     date = img.get('simple_date')
-    same_day = S2.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
+    same_day = L8.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
     return same_day.first()
 
 def best_image_per_dateL7(img):
     date = img.get('simple_date')
-    same_day = S2.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
+    same_day = L7.filter(ee.Filter.eq('simple_date', date)).sort('valid_pixels', False)
     return same_day.first()
 
 def best_image_per_dateL5(img):
@@ -281,6 +280,7 @@ records = Tools.generate_attributes(wl_data.getInfo()['features'])
 Tools.upsert_satellite_csv(records)
         
         
+
 
 
 
