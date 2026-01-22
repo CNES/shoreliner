@@ -6,18 +6,9 @@ import zipfile
 from osgeo import gdal
 global inputs
 import datetime as dt
+
+
 #%% General
-
-# def index_f2(name):
-#     if name == 'SCoWI':
-#         return([SCoWIL5,SCoWIL7,SCoWIL8,SCoWIL9,SCoWIS2])
-#     elif name == 'MNDWI':
-
-#         return([MNDWIL5,MNDWIL7,MNDWIL8,MNDWIL9,MNDWIS2])
-#     elif name == 'NDVI':
-#         return([NDVIL5,NDVIL7,NDVIL8,NDVIL9,NDVIS2])
-#     else:
-#         return('Error')
 
 def index_f(name):
     if name == 'SCoWI':
@@ -32,6 +23,10 @@ def index_f(name):
         return(AWEIns)
     elif name == 'NDVI':
         return(NDVI)
+    elif name == 'SRWI':
+        return(SRWI)
+    elif name == 'SBI':
+        return(SBI)
     else:
         raise('Error : Unknown index. Index  known by default : SCoWI, MNDWI, NDWI, NDVI, AWEIns and AWEIsh')
 
@@ -276,6 +271,14 @@ def AWEIns(image):
       'SWIR2': image.select('swir2')
     }).rename('AWEIns').copyProperties(image,['date','satellite','cloud_cover'])
 
+def SRWI(image):
+   return image.expression('( GREEN + BLUE - NIR - SWIR1)/(GREEN + BLUE + NIR + SWIR1)',#
+    {
+      'GREEN': image.select('green'),
+      'NIR': image.select('nir'),
+      'SWIR1': image.select('swir1'),
+      'BLUE': image.select('blue')
+    }).rename('SRWI').copyProperties(image,['date','satellite','cloud_cover'])
 
 def RGB(image):
         #image = image.resample('bicubic')
@@ -395,3 +398,4 @@ def saveImage(imggee, i, length, filepath, index, poly):
     #                 os.remove(os.path.join(filepath,'data.tif.aux'))
     #         except:
     #             pass
+
