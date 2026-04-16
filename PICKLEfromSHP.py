@@ -2,7 +2,7 @@ import geopandas as gpd
 import pickle
 import numpy as np
 import sys
-sys.path.insert(0, r"/)root/to/Codes")
+sys.path.insert(0, r"/root/to/Codes")
 from functions import Tools
 
 epsg_target = 4326
