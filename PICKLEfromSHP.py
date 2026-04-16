@@ -2,8 +2,10 @@ import geopandas as gpd
 import pickle
 import numpy as np
 import sys
-sys.path.insert(0, r"/work/scratch/data/graffim/shorelines/Codes/shoreliner_main/Codes")
+sys.path.insert(0, r"/)root/to/Codes")
 from functions import Tools
+
+epsg_target = 4326
 
 def create_transect_dict(shp_file, output_pickle_file, prefix="PF",proj=False,projepsg=4326):
     """
@@ -52,5 +54,5 @@ def create_transect_dict(shp_file, output_pickle_file, prefix="PF",proj=False,pr
 
 # Example usage
 shp_file = r"C:\Users\pc\Downloads\transects.shp"  # Replace with the actual path to your .shp file
-output_pickle_file = r"C:\Users\pc\Downloads\AugustusTransects.p"       # Replace with your desired output .p file name
-create_transect_dict(shp_file, output_pickle_file,proj=True,projepsg = 32613)
+output_pickle_file = r"path/out/to/transects.p"       # Replace with your desired output .p file name
+create_transect_dict(shp_file, output_pickle_file,proj=True,projepsg = epsg_target)
