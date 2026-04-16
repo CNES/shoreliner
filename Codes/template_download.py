@@ -249,8 +249,8 @@ if inputs['RGB']:
 length=sizeDataset.getInfo()
 
 #CREATE A .CSV FILE TO CHECK THE COLLECTION OF IMAGES
-records = Tools.generate_attributes(wl_data.getInfo()['features'])
-Tools.upsert_satellite_csv(records)
+#records = Tools.generate_attributes(wl_data.getInfo()['features'])
+#Tools.upsert_satellite_csv(records)
 
 
 for i in range(length):
@@ -276,8 +276,8 @@ for i in range(length):
         GEE.saveImage(img, i, length, filepath_rgb, ['red','green','blue'], polygon_geom)
         
 #UPDATE THE .CSV FILE TO INFORM ON THE PROGRESS OF DOWNLOADED IMAGES
-records = Tools.generate_attributes(wl_data.getInfo()['features'])
-Tools.upsert_satellite_csv(records)
+#records = Tools.generate_attributes(wl_data.getInfo()['features'])
+#Tools.upsert_satellite_csv(records)
         
         
 
