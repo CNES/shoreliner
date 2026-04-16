@@ -53,6 +53,6 @@ def create_transect_dict(shp_file, output_pickle_file, prefix="PF",proj=False,pr
     print(f"Transect dictionary saved to {output_pickle_file}")
 
 # Example usage
-shp_file = r"C:\Users\pc\Downloads\transects.shp"  # Replace with the actual path to your .shp file
+shp_file = r"path/to/transects.shp"  # Replace with the actual path to your .shp file
 output_pickle_file = r"path/out/to/transects.p"       # Replace with your desired output .p file name
 create_transect_dict(shp_file, output_pickle_file,proj=True,projepsg = epsg_target)
